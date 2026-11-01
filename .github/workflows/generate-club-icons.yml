@@ -1,0 +1,44 @@
+name: Regenerate high-resolution club icons
+on:
+  push:
+    paths:
+      - .github/workflows/generate-club-icons.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-icons:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install imaging tools
+        run: python -m pip install pillow==11.3.0
+      - name: Create high-quality icon assets
+        run: |
+          python - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          src = Image.open('assets/icon-samurai-source.png').convert('RGB')
+          if src.size != (192, 192):
+              raise RuntimeError(f'Unexpected source size: {src.size}')
+          src.save('icon-192-v3.png', optimize=True)
+          src.resize((512, 512), Image.Resampling.LANCZOS).save('icon-512-v3.png', optimize=True)
+          for p in ('icon-192-v3.png', 'icon-512-v3.png'):
+              im = Image.open(p)
+              im.verify()
+              print(p, Path(p).stat().st_size)
+          PY
+      - name: Commit regenerated assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add icon-192-v3.png icon-512-v3.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Generate sharper club icons for Android splash screen"
+            git push
+          fi
