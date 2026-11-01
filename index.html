@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1d2635"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Маркообразные">
+<meta name="description" content="Новости, мероприятия и жизнь автоклуба Маркообразные Новосибирск">
+<link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon-192-v3.png" type="image/png">
+<link rel="stylesheet" href="./style.css">
+<title>Маркообразные Новосибирск — тестовое PWA</title>
+</head>
+<body>
+<div class="petals" aria-hidden="true"></div>
+<div class="sakura-side sakura-side--left" aria-hidden="true"></div>
+<div class="sakura-side sakura-side--right" aria-hidden="true"></div>
+<div class="sakura-breeze" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span><span></span>
+</div>
+<aside id="installBanner" class="install-banner" aria-label="Установка приложения" hidden>
+  <img class="install-badge" src="./icon-192-v3.png" alt="" width="48" height="48">
+  <div class="install-copy"><strong>Маркообразные — на телефон</strong><span>Новости клуба всегда под рукой</span></div>
+  <button id="installNow" class="install-action" type="button">Установить</button>
+  <button id="installDismiss" class="install-dismiss" type="button" aria-label="Закрыть предложение установки">×</button>
+</aside>
+<dialog id="installHelp" class="install-help" aria-labelledby="installHelpTitle">
+  <button class="install-help-close" id="installHelpClose" aria-label="Закрыть инструкцию" type="button">×</button>
+  <h2 id="installHelpTitle">Установка приложения</h2>
+  <div id="installHelpBody"></div>
+  <button id="installHelpDone" class="install-help-done" type="button">Понятно</button>
+</dialog>
+
+<div id="app">
+<section id="onboard" class="welcome">
+<div class="welcome-card">
+<div class="sakura-mark">桜</div><div class="eyebrow">АВТОКЛУБ · НОВОСИБИРСК</div>
+<h1 class="wordmark">МАРКООБРАЗНЫЕ <em>НОВОСИБИРСК</em></h1>
+<div class="redline"></div><p>Одно место для клубных новостей, встреч и фотоотчетов.</p>
+<button class="btn primary" id="memberStart">Продолжить как участник ↗</button>
+<button class="btn outlined" id="adminStart">Войти как администратор</button>
+<label class="remember"><input id="remember" type="checkbox" checked> Больше не показывать этот экран</label>
+<div class="smallmuted">Предварительная версия для пяти тестировщиков</div>
+<footer class="kapibara-credit" aria-label="Создатель приложения"><span>© 2026 Kapibara AI</span></footer>
+</div></section>
+<section id="screen" class="screen hidden">
+<header class="masthead" aria-label="Автоклуб Маркообразные Новосибирск">
+  <img class="masthead-full-logo" src="./assets/club-logo-official-hq.svg"
+       alt="Официальный логотип автоклуба Маркообразные Новосибирск"
+       loading="eager" decoding="async">
+  <button class="masthead-compact" type="button" data-to="home" aria-label="На главную">
+    <img class="masthead-compact__emblem" src="./icon-512-v3.png" alt="" width="56" height="56" decoding="async">
+    <span class="masthead-compact__text"><strong>МАРКООБРАЗНЫЕ</strong><small>НОВОСИБИРСК</small></span>
+    <svg class="masthead-compact__home" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1v-9.5Z"/></svg>
+  </button>
+</header>
+<div class="wrap">
+<div class="welcome-strip"><div><div class="eyebrow" id="pageKicker">КЛУБНОЕ ПРИЛОЖЕНИЕ</div><h2 id="pageTitle">Главная</h2></div><div class="strip-actions"><button id="adminOpen" class="iconbtn admin-open" type="button" title="Админ-панель" aria-label="Открыть админ-панель" hidden><span aria-hidden="true">✎</span><span class="admin-open__label">Админ</span></button><button id="settings" class="iconbtn" title="Режим входа" aria-label="Режим входа">⚙</button></div></div>
+<main>
+<section data-page="home" class="page">
+<section class="merch-teaser" aria-labelledby="merchTeaserTitle">
+  <div class="merch-teaser__head">
+    <div class="merch-teaser__copy">
+      <div class="eyebrow">КЛУБНАЯ АТРИБУТИКА</div>
+      <h3 id="merchTeaserTitle">Мерч клуба</h3>
+      <p>Клубная атрибутика с символикой «Маркообразных». Листайте стрелками или свайпом — цены указаны на карточках.</p>
+    </div>
+  </div>
+  <div class="merch-teaser__rail">
+  <button class="merch-arrow" type="button" data-merch-prev aria-label="Предыдущие товары">←</button>
+  <ul class="merch-rail" id="merchRail" aria-label="Товары клуба"></ul>
+  <button class="merch-arrow" type="button" data-merch-next aria-label="Следующие товары">→</button>
+  </div>
+  <div class="merch-teaser__foot">
+    <button class="btn primary" data-to="merch">Смотреть мерч ↗</button>
+    <span class="merch-hint">Листайте стрелками или свайпом →</span>
+  </div>
+</section>
+
+<div class="hero"><div class="eyebrow">БОЛЬШЕ ЧЕМ КЛУБ</div><h2>Одна история.<br><span>Разные машины.</span></h2><p>Новости и предстоящие события автоклуба — всегда под рукой.</p><button data-to="news" class="btn primary">Читать новости ↗</button></div>
+<div class="sectionhead"><h3>Разделы клуба</h3></div>
+<div class="tile-grid tile-grid--club">
+<button class="tile" data-to="calendar"><span class="tile-icon">▦</span><strong>Календарь</strong><small>Планы и встречи</small><span class="tile-arrow">↗</span></button>
+<button class="tile" data-to="photos"><span class="tile-icon tile-icon--photo" aria-hidden="true"><svg viewBox="0 0 24 24" width="29" height="29" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.8h3.2L8.4 5.9h7.2l1.7 2.9h3.2v9.7h-17z"/><circle cx="12" cy="13.4" r="3.3"/></svg></span><strong>Фотоотчеты</strong><small>Как это было</small><span class="tile-arrow">↗</span></button>
+<button class="tile" data-to="admins"><span class="tile-icon">♙</span><strong>Администраторы</strong><small>Люди и машины</small><span class="tile-arrow">↗</span></button>
+<button class="tile" data-to="news"><span class="tile-icon">▤</span><strong>Новости</strong><small>Что нового в клубе</small><span class="tile-arrow">↗</span></button>
+<button class="tile tile--partners" data-to="partners"><span class="tile-icon" aria-hidden="true">◇</span><strong>Партнёры</strong><small>Друзья и поддержка клуба</small><span class="tile-arrow" aria-hidden="true">↗</span></button>
+<button class="tile tile--merch" data-to="merch"><span class="tile-icon tile-icon--bag" aria-hidden="true"><svg viewBox="0 0 24 24" width="29" height="29" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-1 13H5L4 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg></span><strong>Мерч</strong><small>Атрибутика клуба</small><span class="tile-arrow" aria-hidden="true">↗</span></button>
+</div>
+<div class="sectionhead"><h3>Последние публикации</h3><button class="minilink" data-to="news">Все новости →</button></div>
+<div id="home-news" class="newslist"></div>
+<section class="social-section" aria-labelledby="social-title">
+  <div class="social-head">
+    <div><div class="eyebrow">НА СВЯЗИ С КЛУБОМ</div><h3 id="social-title">Мы в соцсетях</h3></div>
+    <p>Сканируй QR-код или переходи по ссылке.</p>
+  </div>
+  <div class="social-grid" aria-label="Социальные сети клуба">
+    <article class="social-card">
+      <div class="social-name"><span class="social-monogram social-tg" aria-hidden="true">TG</span><div><strong>Telegram</strong><small>Клубный чат</small></div></div>
+      <div class="social-qr" data-qr="telegram" role="img" aria-label="QR-код приглашения в Telegram-чат"></div>
+      <a class="social-visit" href="https://t.me/+G8howK-ojhw1MDAy" target="_blank" rel="noopener noreferrer">Открыть Telegram <span aria-hidden="true">↗</span></a>
+    </article>
+    <article class="social-card">
+      <div class="social-name"><span class="social-monogram social-vk" aria-hidden="true">VK</span><div><strong>ВКонтакте</strong><small>Сообщество</small></div></div>
+      <div class="social-qr" data-qr="vk" role="img" aria-label="QR-код сообщества ВКонтакте"></div>
+      <a class="social-visit" href="https://vk.ru/markoobrazznovosib" target="_blank" rel="noopener noreferrer">Открыть ВК <span aria-hidden="true">↗</span></a>
+    </article>
+    <article class="social-card">
+      <div class="social-name"><span class="social-monogram social-ig" aria-hidden="true">IG</span><div><strong>Instagram</strong><small>Фото клуба</small></div></div>
+      <div class="social-qr" data-qr="instagram" role="img" aria-label="QR-код страницы Instagram"></div>
+      <a class="social-visit" href="https://www.instagram.com/markoobraz_nsk_54?psln=aGxvdmlwdWRoOXk0" target="_blank" rel="noopener noreferrer">Открыть Instagram <span aria-hidden="true">↗</span></a>
+    </article>
+  </div>
+  <p class="social-scroll-hint">Листай карточки в сторону <span aria-hidden="true">→</span></p>
+</section>
+</section>
+<section data-page="news" class="page hidden">
+<div class="sectionhead"><h3>Новости автоклуба</h3><button id="refreshNews" class="minilink">↻ Обновить</button></div>
+<p class="hint">Новости клуба. Администраторы добавляют записи прямо в приложении, а публикации из GitHub подгружаются автоматически.</p>
+<div id="news-status" class="smallmuted" aria-live="polite"></div>
+<div id="news-list" class="newslist"></div></section>
+<section data-page="calendar" class="page hidden">
+<div class="sectionhead"><h3>Ближайшие мероприятия</h3></div>
+<p class="hint">Встречи клуба. Даты и описания обновляют администраторы — изменения сразу видны в приложении.</p>
+<div id="eventList" class="event-list"></div>
+</section>
+<section data-page="merch" class="page hidden">
+  <div class="sectionhead"><h3>Мерч автоклуба</h3></div>
+  <p class="hint">Те же товары, что и на главной. Нажмите на карточку — откроются описание и размерная сетка.</p>
+  <div id="merchGrid" class="merch-grid"></div>
+  <a class="btn outlined merch-order" href="https://t.me/+G8howK-ojhw1MDAy" target="_blank" rel="noopener noreferrer">Написать в Telegram ↗</a>
+</section>
+<section data-page="photos" class="page hidden">
+<div class="sectionhead"><h3>Снимки со встреч</h3></div>
+<p class="hint">Кадры с прошедших встреч клуба. Нажмите на альбом — откроются фото и ссылка на полную папку.</p>
+<div id="photoGrid" class="photo-grid"></div>
+<a class="btn outlined photo-cta" href="https://t.me/+G8howK-ojhw1MDAy" target="_blank" rel="noopener noreferrer">Поделиться кадрами в Telegram ↗</a>
+</section>
+<section data-page="partners" class="page hidden">
+  <div class="sectionhead"><h3>Партнёры автоклуба</h3></div>
+  <div id="partnersEmpty" class="partners-empty">
+    <div class="partners-empty__symbol" aria-hidden="true">◇</div>
+    <div class="eyebrow">НАШИ ДРУЗЬЯ</div>
+    <h3>Здесь появятся партнёры клуба</h3>
+    <p>Скоро познакомим вас с компаниями и сервисами, которые поддерживают «Маркообразные Новосибирск». Добавим логотипы, краткие описания и ссылки на их страницы.</p>
+    <button class="btn outlined" data-to="home">← На главную</button>
+  </div>
+  <div id="partnersList" class="partners-grid" hidden></div>
+</section>
+<section data-page="admins" class="page hidden">
+<div class="sectionhead"><h3>Администраторы</h3></div>
+<p class="hint">Люди, которые ведут клуб. Состав обновляется в админ-панели.</p>
+<div id="adminList" class="admin-grid admin-grid--profiles"></div>
+</section>
+<section data-page="admin" class="page hidden">
+<div id="adminRoot"></div>
+</section></main>
+<footer class="kapibara-credit" aria-label="Создатель приложения"><span>© 2026 Kapibara AI</span></footer>
+</div>
+<nav class="bottom" aria-label="Разделы">
+<button data-to="home" class="current"><span class="nav-symbol" aria-hidden="true">⌂</span><span class="nav-label">Главная</span></button>
+<button data-to="calendar"><span class="nav-symbol" aria-hidden="true">▦</span><span class="nav-label">События</span></button>
+<button data-to="news"><span class="nav-symbol" aria-hidden="true">▤</span><span class="nav-label">Новости</span></button>
+<button data-to="photos"><span class="nav-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.8h3.2L8.4 5.9h7.2l1.7 2.9h3.2v9.7h-17z"/><circle cx="12" cy="13.4" r="3.3"/></svg></span><span class="nav-label">Фото</span></button>
+<button data-to="admins"><span class="nav-symbol" aria-hidden="true">♙</span><span class="nav-label">Админы</span></button>
+<button data-to="merch"><span class="nav-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-1 13H5L4 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg></span><span class="nav-label">Мерч</span></button></nav>
+</section></div>
+<dialog id="storyDialog"><button id="closeDialog" class="closebtn">✕</button><div id="dialogContent"></div></dialog>
+<dialog id="merchDialog" aria-labelledby="merchDialogTitle"><button id="closeMerch" class="closebtn" type="button" aria-label="Закрыть карточку товара">✕</button><div id="merchDialogContent"></div></dialog>
+<dialog id="photoDialog" aria-labelledby="photoDialogTitle"><div id="photoDialogContent"></div></dialog>
+<dialog id="editorDialog" aria-labelledby="editorTitle">
+<button id="editorClose" class="closebtn" type="button" aria-label="Закрыть редактор">✕</button>
+<div class="editor-head"><div class="eyebrow" id="editorEyebrow">АДМИН-ПАНЕЛЬ</div><h2 id="editorTitle">Редактирование</h2></div>
+<form id="editorForm" class="editor-form" novalidate></form>
+</dialog>
+<dialog id="confirmDialog" class="confirm-dialog" aria-labelledby="confirmTitle">
+<h2 id="confirmTitle">Удалить запись?</h2>
+<p id="confirmText"></p>
+<div class="confirm-actions"><button id="confirmCancel" class="btn outlined" type="button">Отмена</button><button id="confirmOk" class="btn primary" type="button">Удалить</button></div>
+</dialog>
+<div id="adminToast" class="admin-toast" role="status" aria-live="polite" hidden></div>
+<script src="./social-qr.js" defer></script>
+<script src="./merch-data.js" defer></script>
+<script src="./photos-data.js" defer></script>
+<script src="./content.js" defer></script>
+<script src="./install.js" defer></script>
+<script src="./admin.js" defer></script>
+<script src="./app.js" defer></script>
+</body></html>
