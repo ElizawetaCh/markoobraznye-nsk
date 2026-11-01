@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 const OWNER='kiberdoker-pixel';
-const REPO='markoobraznye-app';
+const REPO='markoobraznye-nsk';
 const API='https://api.github.com/repos/'+OWNER+'/'+REPO+'/issues?state=open&per_page=50&sort=created&direction=desc';
 const $=q=>document.querySelector(q);
 const $$=q=>Array.from(document.querySelectorAll(q));
