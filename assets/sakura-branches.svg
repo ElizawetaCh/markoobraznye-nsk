@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="920" viewBox="0 0 320 920" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="twig" x1="0" y1="920" x2="210" y2="280" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ac6c8e" stop-opacity=".86"/>
+      <stop offset=".65" stop-color="#a06584" stop-opacity=".75"/>
+      <stop offset="1" stop-color="#b17a9c" stop-opacity=".25"/>
+    </linearGradient>
+    <radialGradient id="petal" cx="0" cy="0" r="1" gradientTransform="translate(-2 -5) rotate(85) scale(17 11)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f9b6d4"/>
+      <stop offset=".67" stop-color="#e98cac"/>
+      <stop offset="1" stop-color="#cc698f"/>
+    </radialGradient>
+    <g id="sakuraFlower">
+      <ellipse cx="0" cy="-9" rx="6.7" ry="11.3" fill="url(#petal)"/>
+      <ellipse cx="0" cy="-9" rx="6.7" ry="11.3" fill="url(#petal)" transform="rotate(72)"/>
+      <ellipse cx="0" cy="-9" rx="6.7" ry="11.3" fill="url(#petal)" transform="rotate(144)"/>
+      <ellipse cx="0" cy="-9" rx="6.7" ry="11.3" fill="url(#petal)" transform="rotate(216)"/>
+      <ellipse cx="0" cy="-9" rx="6.7" ry="11.3" fill="url(#petal)" transform="rotate(288)"/>
+      <circle r="3.3" fill="#e6c8a8"/>
+      <circle r="1.5" fill="#f4ddaa"/>
+    </g>
+  </defs>
+  <g stroke="url(#twig)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-26 946C20 859 9 808 56 733C98 669 114 594 119 526C121 454 86 403 117 323C128 295 151 264 158 224" stroke-width="11" />
+    <path d="M49 758C95 722 142 713 218 678" stroke-width="6"/>
+    <path d="M89 662C132 613 190 584 239 549" stroke-width="5.5"/>
+    <path d="M116 538C149 516 192 460 221 404" stroke-width="5"/>
+    <path d="M113 478C75 448 45 403 16 360" stroke-width="4.5"/>
+    <path d="M114 378C142 340 195 312 224 285" stroke-width="3.6"/>
+    <path d="M41 815C106 798 124 769 161 724" stroke-width="4"/>
+    <path d="M172 600C202 613 226 621 254 648" stroke-width="2.9"/>
+    <path d="M147 495C172 503 210 509 230 535" stroke-width="2.8"/>
+    <path d="M64 718C28 690 15 655 -4 632" stroke-width="3.5"/>
+    <path d="M122 323C94 298 83 258 69 229" stroke-width="3"/>
+    <path d="M115 577C82 563 52 544 40 522" stroke-width="3.4"/>
+  </g>
+  <g>
+  <use href="#sakuraFlower" transform="translate(89 754) rotate(-15) scale(1.35)" opacity="0.72"/>
+  <use href="#sakuraFlower" transform="translate(40 795) rotate(20) scale(0.8)" opacity="0.79"/>
+  <use href="#sakuraFlower" transform="translate(146 714) rotate(-22) scale(0.88)" opacity="0.86"/>
+  <use href="#sakuraFlower" transform="translate(204 696) rotate(20) scale(0.72)" opacity="0.93"/>
+  <use href="#sakuraFlower" transform="translate(123 622) rotate(14) scale(1.2)" opacity="0.72"/>
+  <use href="#sakuraFlower" transform="translate(57 663) rotate(-20) scale(0.67)" opacity="0.79"/>
+  <use href="#sakuraFlower" transform="translate(199 587) rotate(-8) scale(1.04)" opacity="0.86"/>
+  <use href="#sakuraFlower" transform="translate(225 540) rotate(17) scale(0.67)" opacity="0.93"/>
+  <use href="#sakuraFlower" transform="translate(139 520) rotate(22) scale(1.17)" opacity="0.72"/>
+  <use href="#sakuraFlower" transform="translate(98 460) rotate(-12) scale(0.83)" opacity="0.79"/>
+  <use href="#sakuraFlower" transform="translate(178 404) rotate(5) scale(1.03)" opacity="0.86"/>
+  <use href="#sakuraFlower" transform="translate(219 358) rotate(-17) scale(0.68)" opacity="0.93"/>
+  <use href="#sakuraFlower" transform="translate(86 394) rotate(29) scale(0.69)" opacity="0.72"/>
+  <use href="#sakuraFlower" transform="translate(40 554) rotate(11) scale(0.77)" opacity="0.79"/>
+  <use href="#sakuraFlower" transform="translate(211 472) rotate(22) scale(0.55)" opacity="0.86"/>
+  <use href="#sakuraFlower" transform="translate(165 638) rotate(14) scale(0.5)" opacity="0.93"/>
+  <use href="#sakuraFlower" transform="translate(73 847) rotate(36) scale(1.05)" opacity="0.72"/>
+  <use href="#sakuraFlower" transform="translate(244 652) rotate(3) scale(0.61)" opacity="0.79"/>
+  <use href="#sakuraFlower" transform="translate(122 317) rotate(-10) scale(0.67)" opacity="0.86"/>
+  <use href="#sakuraFlower" transform="translate(159 280) rotate(20) scale(0.48)" opacity="0.93"/>
+  </g>
+  <g fill="#f0a3c2" opacity=".60">
+    <ellipse cx="258" cy="301" rx="5" ry="9" transform="rotate(34 258 301)"/>
+    <ellipse cx="277" cy="454" rx="4" ry="7" transform="rotate(-45 277 454)"/>
+    <ellipse cx="244" cy="215" rx="3.5" ry="6" transform="rotate(23 244 215)"/>
+    <ellipse cx="192" cy="192" rx="3.8" ry="7.4" transform="rotate(50 192 192)"/>
+    <ellipse cx="292" cy="574" rx="6" ry="10" transform="rotate(32 292 574)"/>
+    <ellipse cx="211" cy="783" rx="4.7" ry="8" transform="rotate(-55 211 783)"/>
+  </g>
+</svg>
