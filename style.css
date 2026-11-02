@@ -23,6 +23,20 @@ small{font-size:var(--fs-6)}.hint{color:var(--muted);line-height:1.65;font-size:
 dialog{max-width:min(600px,95vw);max-height:85vh;overflow:auto;border:1px solid #66707c;background:#141a23;color:#fff;border-radius:16px;padding:26px;box-shadow:0 20px 70px #000b}dialog::backdrop{background:#000b}dialog p{white-space:pre-wrap;line-height:1.7;color:#c4ccd5}dialog img{max-width:100%;border-radius:12px}.closebtn{float:right;background:none;border:0;color:#fff;font-size:1.4rem}
 @media(max-width:750px){.tile-grid,.newslist,.admin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tile{min-height:165px}.masthead .wordmark{font-size:var(--fs-1)}}@media(max-width:460px){.masthead-inner{padding:23px 15px}.wrap{padding:0 14px 114px}.tile{padding:13px 11px;min-height:156px}.tile strong{font-size:var(--fs-5)}.tile small{font-size:var(--fs-6)}.newslist{grid-template-columns:1fr}.hero{padding:22px;min-height:260px}.hero h2{font-size:var(--fs-1)}.admin-grid{grid-template-columns:1fr}.event-card{padding:15px;gap:10px}.event-card .day{font-size:var(--fs-2);min-width:52px}.welcome-card{padding:30px 19px}}
 
+/* Cooperation block: sits between the club sections and the social links. */
+.coop-section{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin:32px 0 6px;padding:22px 24px;border-radius:21px;border:1px solid rgba(244,164,194,.22);background:radial-gradient(ellipse at 6% 0%,rgba(226,96,137,.17),transparent 52%),linear-gradient(140deg,#232c3a,#12171f);box-shadow:0 14px 38px #0002}
+.coop-section:after{content:"✿";position:absolute;right:10px;bottom:-48px;font-size:154px;line-height:1;color:rgba(239,157,187,.085);pointer-events:none}
+.coop-copy{position:relative;z-index:1;min-width:0;max-width:600px}
+.coop-copy h3{margin:6px 0 8px;font-size:var(--fs-3);letter-spacing:-.03em}
+.coop-copy p{margin:0;color:#b9c3ce;font-size:var(--fs-5);line-height:1.6}
+.coop-list{display:flex;flex-wrap:wrap;gap:7px 18px;list-style:none;margin:12px 0 0;padding:0;color:#ccd4dd;font-size:var(--fs-6)}
+.coop-list li{display:flex;align-items:center;gap:6px}
+.coop-list li span{color:#f290a6;font-size:.6rem}
+.coop-actions{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:9px}
+.coop-actions .btn{margin:0;padding:11px 16px;min-height:44px;font-size:var(--fs-6)}
+.coop-section + .social-section{margin-top:16px}
+@media(max-width:700px){.coop-section{padding:18px}.coop-actions{width:100%}.coop-actions .btn{flex:1 1 160px}}
+
 /* Club social links: three scannable QRs, swipeable on small screens. */
 /* Club social links: compact cards with a small QR, at the end of the home page. */
 .social-section{margin:36px 0 24px;padding:16px 18px;border-radius:21px;border:1px solid rgba(245,245,245,.12);background:radial-gradient(ellipse at 96% 4%,rgba(226,96,137,.14),transparent 45%),linear-gradient(145deg,#1c232b,#10141b);box-shadow:0 14px 38px #0002}
@@ -200,16 +214,24 @@ body:before,body:after{opacity:.11}
 }
 
 
-/* Partner section — ready for real company cards, without fictional partners. */
-@media (min-width:1050px){
-  .tile-grid--club{grid-template-columns:repeat(5,minmax(0,1fr))}
-}
+/* Club sections: a compact strip placed below the latest publications. */
+.tile-grid--club{grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.tile-grid--club .tile{min-height:106px;padding:13px 12px;gap:3px;border-radius:15px}
+.tile-grid--club .tile-icon{font-size:1.45rem;line-height:1.1}
+.tile-grid--club .tile-icon svg{width:23px;height:23px}
+.tile-grid--club .tile strong{font-size:var(--fs-5);line-height:1.2;letter-spacing:-.01em;padding-right:12px}
+.tile-grid--club .tile small{font-size:var(--fs-7);line-height:1.3}
+.tile-grid--club .tile-arrow{right:10px;bottom:8px;font-size:var(--fs-6);opacity:.72}
 @media (min-width:760px) and (max-width:1049px){
   .tile-grid--club{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media (max-width:759px){
   .tile-grid--club{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .tile-grid--club .tile--partners{grid-column:1/-1;min-height:135px}
+  .tile-grid--club .tile--partners{grid-column:1/-1;min-height:106px}
+}
+@media (max-width:460px){
+  .tile-grid--club .tile{min-height:96px;padding:11px 10px}
+  .tile-grid--club .tile small{display:none}
 }
 .partners-empty{
   position:relative;overflow:hidden;
