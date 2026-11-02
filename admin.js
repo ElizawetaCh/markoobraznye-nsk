@@ -176,6 +176,7 @@
           ]
         },
         { name: 'note', label: 'Короткая подпись', type: 'text', placeholder: 'Размеры S–XXL' },
+        { name: 'photos', label: 'Фотографии товара', type: 'images', max: 6, hint: 'До 6 фото. Первое станет обложкой карточки. Без фото покажем иконку.' },
         { name: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Материал, посадка, особенности' },
         { name: 'sizes', label: 'Размеры', type: 'text', placeholder: 'S, M, L, XL, XXL', hint: 'Через запятую. Оставьте пустым, если размеров нет.' },
         { name: 'sizesNote', label: 'Подпись вместо размеров', type: 'text', placeholder: 'Один размер, обхват головы 56–60 см' },
@@ -200,6 +201,7 @@
       row: item => ({
         title: item.name,
         meta: [item.price, item.note].filter(Boolean).join(' · '),
+        thumb: Array.isArray(item.photos) ? item.photos[0] : '',
         fallback: '◇'
       })
     },
@@ -375,6 +377,91 @@
     return wrap;
   }
 
+  /* Multi-photo widget: up to six shots, the first one becomes the card cover. */
+  function imagesField(field, value) {
+    const wrap = document.createElement('div');
+    wrap.className = 'editor-field editor-field--images';
+    const label = document.createElement('span');
+    label.className = 'editor-field__label';
+    label.textContent = field.label;
+    const max = field.max || 6;
+    let photos = Array.isArray(value) ? value.filter(Boolean).slice(0, max) : [];
+
+    const grid = document.createElement('div');
+    grid.className = 'editor-images';
+
+    const fileId = uid('files');
+    const file = document.createElement('input');
+    file.type = 'file';
+    file.accept = 'image/*';
+    file.multiple = true;
+    file.id = fileId;
+    file.className = 'editor-image__file';
+
+    const add = document.createElement('label');
+    add.className = 'editor-image-add';
+    add.htmlFor = fileId;
+
+    const paint = () => {
+      grid.replaceChildren();
+      photos.forEach((src, index) => {
+        const tile = document.createElement('div');
+        tile.className = 'editor-image-tile';
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = 'Фото ' + (index + 1);
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'editor-image-tile__remove';
+        remove.setAttribute('aria-label', 'Удалить фото ' + (index + 1));
+        remove.textContent = '✕';
+        remove.addEventListener('click', () => {
+          photos.splice(index, 1);
+          paint();
+        });
+        tile.append(img, remove);
+        grid.append(tile);
+      });
+      if (photos.length < max) {
+        add.replaceChildren();
+        add.append(document.createTextNode('+ Добавить фото'));
+        const small = document.createElement('small');
+        small.textContent = photos.length ? photos.length + ' из ' + max : 'до ' + max;
+        add.append(small);
+        grid.append(add);
+      }
+    };
+
+    file.addEventListener('change', async () => {
+      const files = Array.from(file.files || []);
+      if (!files.length) return;
+      add.classList.add('is-busy');
+      add.textContent = 'Загрузка…';
+      for (const selected of files) {
+        if (photos.length >= max) break;
+        try {
+          photos.push(await shrinkImage(selected));
+        } catch (error) {
+          toast(error.message || 'Не удалось загрузить фото', true);
+        }
+      }
+      add.classList.remove('is-busy');
+      file.value = '';
+      paint();
+    });
+
+    paint();
+    wrap.append(label, grid, file);
+    if (field.hint) {
+      const hint = document.createElement('span');
+      hint.className = 'editor-hint';
+      hint.textContent = field.hint;
+      wrap.append(hint);
+    }
+    wrap.getValue = () => photos.slice();
+    return wrap;
+  }
+
   function draftFrom(config, item) {
     if (!item) return config.empty ? config.empty() : {};
     const draft = { ...item };
@@ -391,11 +478,15 @@
     form.replaceChildren();
     const draft = draftFrom(config, item);
     let imageWidget = null;
+    let imagesWidget = null;
 
     config.fields.forEach(field => {
       if (field.type === 'image') {
         imageWidget = imageField(field, draft[config.imageKey] || '');
         form.append(imageWidget);
+      } else if (field.type === 'images') {
+        imagesWidget = imagesField(field, draft[field.name] || []);
+        form.append(imagesWidget);
       } else {
         form.append(fieldWrap(field, draft[field.name]));
       }
@@ -424,11 +515,12 @@
       if (!form.reportValidity()) return;
       const values = {};
       config.fields.forEach(field => {
-        if (field.type === 'image') return;
+        if (field.type === 'image' || field.type === 'images') return;
         const input = form.elements[field.name];
         values[field.name] = input ? input.value : '';
       });
       const record = config.collect(values, imageWidget ? imageWidget.getValue() : null);
+      if (imagesWidget) record.photos = imagesWidget.getValue();
       record.id = item ? item.id : uid(config.key);
       const saved = store.update(data => {
         const list = data[config.key];
