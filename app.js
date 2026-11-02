@@ -155,13 +155,6 @@ function renderAdmins(){
   card.append(media,details);return card;
  }));
 }
-function telegramHref(value){
- const raw=String(value||'').trim();if(!raw)return '';
- if(/^https?:\/\//i.test(raw))return raw;
- if(/^(t\.me|telegram\.me)\//i.test(raw))return 'https://'+raw;
- if(raw.startsWith('@'))return 'https://t.me/'+raw.slice(1);
- return 'https://t.me/'+raw.replace(/^\/+/,'');
-}
 function renderPartners(){
  const list=$('#partnersList'),empty=$('#partnersEmpty');if(!list||!empty)return;
  const partners=content().partners||[];
@@ -179,21 +172,9 @@ function renderPartners(){
   const body=document.createElement('div');body.className='partner-card__body';
   const name=document.createElement('h3');name.textContent=partner.name||'Партнёр';body.append(name);
   if(partner.description){const text=document.createElement('p');text.textContent=partner.description;body.append(text)}
-  const tgHref=telegramHref(partner.telegram);
-  if(partner.url||tgHref){
-   const actions=document.createElement('div');actions.className='partner-card__actions';
-   if(partner.url){
-    const link=document.createElement('a');link.className='minilink';link.href=partner.url;link.target='_blank';link.rel='noopener noreferrer';
-    link.textContent='Перейти на сайт ↗';actions.append(link);
-   }
-   if(tgHref){
-    const tg=document.createElement('a');tg.className='partner-telegram';tg.href=tgHref;tg.target='_blank';tg.rel='noopener noreferrer';
-    tg.setAttribute('aria-label','Написать в Telegram: '+(partner.name||'партнёр'));
-    const plane=document.createElement('span');plane.className='partner-telegram__icon';plane.setAttribute('aria-hidden','true');plane.textContent='✈';
-    const label=document.createElement('span');label.textContent='Написать в Telegram';
-    tg.append(plane,label);actions.append(tg);
-   }
-   body.append(actions);
+  if(partner.url){
+   const link=document.createElement('a');link.className='minilink';link.href=partner.url;link.target='_blank';link.rel='noopener noreferrer';
+   link.textContent='Перейти на сайт ↗';body.append(link);
   }
   card.append(media,body);return card;
  }));
