@@ -468,6 +468,46 @@ body:before,body:after{opacity:.11}
 .merch-modal__actions .btn{flex:1 1 180px;margin:0}
 @media(max-width:460px){.merch-modal{padding:20px 16px 20px}.merch-modal__head{gap:12px}.merch-modal__pic{width:76px;height:76px}.merch-modal__pic svg{width:38px;height:38px}}
 
+/* Product photos: cover, gallery, thumbnails and an enlarged view. */
+#merchDialog .closebtn{background:rgba(8,12,18,.55);backdrop-filter:blur(4px);border-radius:9px}
+.merch-pic--photo{overflow:hidden;padding:0;background:#0b1016}
+.merch-pic--photo img{display:block;width:100%;height:100%;object-fit:cover}
+.merch-modal__pic{width:128px;height:128px}
+.merch-modal__pic svg{width:64px;height:64px}
+.merch-gallery{display:flex;flex-direction:column;gap:8px;margin:0 0 14px}
+.merch-gallery__main{display:block;width:100%;padding:0;border:1px solid rgba(246,155,189,.18);border-radius:14px;overflow:hidden;background:#0b1016;cursor:zoom-in;line-height:0}
+.merch-gallery__main img{display:block;width:100%;height:auto;max-height:min(54vh,480px);object-fit:contain;background:#0b1016}
+.merch-gallery__main:hover{border-color:rgba(231,83,99,.55)}
+.merch-gallery__thumbs{display:flex;gap:8px;overflow-x:auto;padding:1px 1px 3px;scrollbar-width:none}
+.merch-gallery__thumbs::-webkit-scrollbar{display:none;height:0}
+.merch-gallery__thumb{flex:0 0 auto;width:60px;height:60px;padding:0;border:1px solid rgba(255,255,255,.14);border-radius:10px;overflow:hidden;background:#0b1016;opacity:.62;transition:opacity .15s,border-color .15s}
+.merch-gallery__thumb img{display:block;width:100%;height:100%;object-fit:cover}
+.merch-gallery__thumb:hover{opacity:.9}
+.merch-gallery__thumb[aria-current="true"]{opacity:1;border-color:rgba(231,83,99,.75)}
+.merch-gallery__hint{margin:0;color:#8f9ba8;font-size:var(--fs-7)}
+.merch-lightbox{position:fixed;inset:0;z-index:9;display:grid;place-items:center;padding:16px;background:rgba(4,7,11,.95);backdrop-filter:blur(5px)}
+.merch-lightbox__img{display:block;max-width:min(100%,1200px);max-height:88vh;width:auto;height:auto;object-fit:contain;border-radius:10px;box-shadow:0 24px 60px #000a}
+.merch-lightbox__close{position:absolute;right:16px;top:16px;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:rgba(8,12,18,.65);color:#fff;font-size:1.1rem;line-height:1;cursor:pointer}
+.merch-lightbox__close:hover{background:rgba(213,43,58,.9)}
+.merch-lightbox__nav{position:absolute;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:44px;height:64px;border:1px solid rgba(255,255,255,.3);border-radius:12px;background:rgba(8,12,18,.62);color:#fff;font-size:1.7rem;line-height:1;cursor:pointer}
+.merch-lightbox__nav:hover{background:rgba(213,43,58,.85)}
+.merch-lightbox__nav--prev{left:14px}
+.merch-lightbox__nav--next{right:14px}
+.merch-lightbox__count{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);padding:6px 14px;border-radius:999px;background:rgba(8,12,18,.7);border:1px solid rgba(255,255,255,.22);color:#e8edf2;font-size:var(--fs-7);letter-spacing:.06em}
+.merch-lightbox.is-single .merch-lightbox__nav,.merch-lightbox.is-single .merch-lightbox__count{display:none}
+@media(max-width:460px){.merch-modal__pic{width:104px;height:104px}.merch-modal__pic svg{width:52px;height:52px}.merch-lightbox__nav{width:38px;height:54px;font-size:1.4rem}.merch-gallery__thumb{width:52px;height:52px}}
+
+/* Admin multi-photo uploader. */
+.editor-images{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:9px}
+.editor-image-tile{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.16);background:#0d1219}
+.editor-image-tile img{display:block;width:100%;height:100%;object-fit:cover}
+.editor-image-tile__remove{position:absolute;right:5px;top:5px;display:grid;place-items:center;width:24px;height:24px;border:0;border-radius:50%;background:rgba(8,12,18,.82);color:#fff;font-size:.72rem;line-height:1;cursor:pointer}
+.editor-image-tile__remove:hover{background:rgba(213,43,58,.9)}
+.editor-image-add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;aspect-ratio:1;padding:6px;border:1px dashed rgba(255,255,255,.3);border-radius:10px;background:rgba(255,255,255,.03);color:#d6dde4;font-size:var(--fs-7);font-weight:700;text-align:center;cursor:pointer}
+.editor-image-add:hover{border-color:rgba(231,83,99,.6);color:#fff}
+.editor-image-add small{font-weight:600;color:#8f9ba8;font-size:var(--fs-7)}
+.editor-image-add.is-busy{opacity:.7;pointer-events:none}
+
 /* Photo album dialog: a compact popup where the whole shot fits inside, with the summary below. */
 #photoDialog{width:min(760px,94vw);max-width:min(760px,94vw);max-height:90vh;margin:auto;padding:0;border:1px solid #66707c;border-radius:18px;background:#141a23;overflow:auto;overscroll-behavior:contain}
 #photoDialogContent{height:auto}
