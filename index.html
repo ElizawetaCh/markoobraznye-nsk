@@ -99,7 +99,8 @@
     </ul>
   </div>
   <div class="coop-actions">
-    <a class="btn primary" href="https://t.me/+G8howK-ojhw1MDAy" target="_blank" rel="noopener noreferrer">Обсудить в Telegram ↗</a>
+    <button class="btn primary" id="adRatesOpen" type="button">Тарифы для рекламы</button>
+    <a class="btn outlined" href="https://t.me/+G8howK-ojhw1MDAy" target="_blank" rel="noopener noreferrer">Обсудить в Telegram ↗</a>
     <button class="btn outlined" data-to="partners">Наши партнёры</button>
   </div>
 </section>
@@ -191,6 +192,40 @@
 <h2 id="confirmTitle">Удалить запись?</h2>
 <p id="confirmText"></p>
 <div class="confirm-actions"><button id="confirmCancel" class="btn outlined" type="button">Отмена</button><button id="confirmOk" class="btn primary" type="button">Удалить</button></div>
+</dialog>
+<dialog id="adRatesDialog" class="rates-dialog" aria-labelledby="adRatesTitle">
+<button id="adRatesClose" class="closebtn" type="button" aria-label="Закрыть тарифы">✕</button>
+<div class="rates-modal">
+  <div class="eyebrow">РЕКЛАМА В КЛУБЕ</div>
+  <h2 id="adRatesTitle">Тарифы для рекламы</h2>
+  <p class="rates-modal__lead">Выберите формат. Точную стоимость и свободные даты подтвердим в Telegram.</p>
+  <div class="rates-grid">
+    <article class="rate-card">
+      <div class="rate-card__icon" aria-hidden="true">▤</div>
+      <h3>Пост</h3>
+      <p>Публикация в ленте клуба: фото или видео, текст и ссылка на ваш проект.</p>
+      <span class="rate-card__meta">1 размещение</span>
+    </article>
+    <article class="rate-card">
+      <div class="rate-card__icon" aria-hidden="true">◎</div>
+      <h3>Сторис</h3>
+      <p>Серия кадров в историях с отметкой аккаунта и переходом по ссылке.</p>
+      <span class="rate-card__meta">1 день · 2–3 кадра</span>
+    </article>
+    <article class="rate-card rate-card--featured">
+      <span class="rate-card__badge">ВЫГОДНО</span>
+      <div class="rate-card__icon" aria-hidden="true">✿</div>
+      <h3>Пакет размещения</h3>
+      <p>Посты раз в неделю на протяжении месяца во всех трёх соцсетях клуба.</p>
+      <span class="rate-card__meta">4 недели · 3 соцсети</span>
+    </article>
+  </div>
+  <div class="rates-modal__actions">
+    <a class="btn primary" href="https://t.me/+G8howK-ojhw1MDAy" target="_blank" rel="noopener noreferrer">Уточнить стоимость ↗</a>
+    <button class="btn outlined" id="adRatesCancel" type="button">Закрыть</button>
+  </div>
+  <p class="rates-modal__note">Итоговая цена зависит от формата, объёма и даты публикации.</p>
+</div>
 </dialog>
 <div id="adminToast" class="admin-toast" role="status" aria-live="polite" hidden></div>
 <script src="./social-qr.js" defer></script>
