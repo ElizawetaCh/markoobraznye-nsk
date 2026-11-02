@@ -216,6 +216,21 @@ function merchPicture(product,className){
   box.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(MERCH_ICONS[product.icon]||MERCH_ICONS.shirt)+'</svg>';
   return box;
 }
+/* Products can have real photos; the first one becomes the card cover. */
+function merchPhotos(product){
+  return Array.isArray(product.photos)?product.photos.filter(Boolean):[];
+}
+function merchVisual(product,className){
+  const photos=merchPhotos(product);
+  if(!photos.length)return merchPicture(product,className);
+  const box=document.createElement('div');
+  box.className=className+' merch-pic--photo';
+  box.setAttribute('aria-hidden','true');
+  const img=document.createElement('img');
+  img.src=photos[0];img.alt='';img.loading='lazy';img.decoding='async';
+  box.append(img);
+  return box;
+}
 function renderMerch(){
   const products=Array.isArray(content().merch)?content().merch:[];
   const rail=$('#merchRail');
@@ -224,7 +239,7 @@ function renderMerch(){
       const li=document.createElement('li');li.className='merch-item';
       const name=document.createElement('strong');name.textContent=p.name;
       const price=document.createElement('span');price.className='merch-item__price';price.textContent=p.price;
-      li.append(merchPicture(p,'merch-item__pic'),name,price);
+      li.append(merchVisual(p,'merch-item__pic'),name,price);
       return li;
     }));
   }
@@ -237,24 +252,60 @@ function renderMerch(){
       const title=document.createElement('span');title.className='merch-card__name';title.textContent=p.name;
       const note=document.createElement('span');note.className='merch-card__note';note.textContent=p.note||'';
       const price=document.createElement('span');price.className='merch-card__price';price.textContent=p.price;
-      card.append(merchPicture(p,'merch-card__pic'),title,note,price);
+      card.append(merchVisual(p,'merch-card__pic'),title,note,price);
       card.addEventListener('click',()=>openMerch(p));
       return card;
     }));
   }
 }
 renderMerch();
-/* Product dialog: description, size picker and measurement chart from merch-data.js. */
+/* Product dialog: photo gallery, description, size picker and measurement chart. */
 function openMerch(product){
+  const dialog=$('#merchDialog');
+  const stale=dialog.querySelector('.merch-lightbox');
+  if(stale)stale.remove();
   const box=$('#merchDialogContent');box.replaceChildren();
   const wrap=document.createElement('div');wrap.className='merch-modal';
+  const photos=merchPhotos(product);
+  let activePhoto=0;
+  if(photos.length){
+    const gallery=document.createElement('div');gallery.className='merch-gallery';
+    const main=document.createElement('button');main.type='button';main.className='merch-gallery__main';
+    main.setAttribute('aria-label','Открыть фото крупнее');
+    const mainImg=document.createElement('img');mainImg.src=photos[activePhoto];mainImg.alt=product.name;mainImg.decoding='async';
+    main.append(mainImg);
+    main.addEventListener('click',()=>openPhotoViewer(photos,activePhoto));
+    gallery.append(main);
+    if(photos.length>1){
+      const thumbs=document.createElement('div');thumbs.className='merch-gallery__thumbs';
+      photos.forEach((src,index)=>{
+        const thumb=document.createElement('button');thumb.type='button';thumb.className='merch-gallery__thumb';
+        thumb.setAttribute('aria-label','Фото '+(index+1));
+        if(index===0)thumb.setAttribute('aria-current','true');
+        const img=document.createElement('img');img.src=src;img.alt='';img.loading='lazy';img.decoding='async';
+        thumb.append(img);
+        thumb.addEventListener('click',()=>{
+          activePhoto=index;mainImg.src=src;
+          thumbs.querySelectorAll('.merch-gallery__thumb').forEach(other=>other.removeAttribute('aria-current'));
+          thumb.setAttribute('aria-current','true');
+        });
+        thumbs.append(thumb);
+      });
+      gallery.append(thumbs);
+    }
+    const hint=document.createElement('p');hint.className='merch-gallery__hint';
+    hint.textContent=photos.length>1?'Нажмите на фото, чтобы рассмотреть ближе. Листайте миниатюры.':'Нажмите на фото, чтобы рассмотреть ближе.';
+    gallery.append(hint);
+    wrap.append(gallery);
+  }
   const head=document.createElement('div');head.className='merch-modal__head';
   const meta=document.createElement('div');meta.className='merch-modal__meta';
   const eyebrow=document.createElement('div');eyebrow.className='eyebrow';eyebrow.textContent='КЛУБНАЯ АТРИБУТИКА';
   const title=document.createElement('h2');title.id='merchDialogTitle';title.textContent=product.name;
   const price=document.createElement('div');price.className='merch-modal__price';price.textContent=product.price;
   meta.append(eyebrow,title,price);
-  head.append(merchPicture(product,'merch-modal__pic'),meta);
+  if(!photos.length)head.append(merchPicture(product,'merch-modal__pic'));
+  head.append(meta);
   wrap.append(head);
   if(product.description){
     const desc=document.createElement('p');desc.className='merch-modal__desc';desc.textContent=product.description;wrap.append(desc);
@@ -313,6 +364,51 @@ function openMerch(product){
 }
 $('#closeMerch').addEventListener('click',()=>$('#merchDialog').close());
 $('#merchDialog').addEventListener('click',event=>{if(event.target===$('#merchDialog'))$('#merchDialog').close()});
+/* Enlarged photo viewer inside the product dialog: arrows, counter, Escape. */
+let closeLightbox=null;
+function openPhotoViewer(photos,start){
+  const host=$('#merchDialog');
+  const existing=host.querySelector('.merch-lightbox');
+  if(existing)existing.remove();
+  let index=Math.max(0,Math.min(start||0,photos.length-1));
+  const viewer=document.createElement('div');viewer.className='merch-lightbox';
+  viewer.setAttribute('role','dialog');viewer.setAttribute('aria-label','Просмотр фото товара');
+  const img=document.createElement('img');img.className='merch-lightbox__img';img.decoding='async';
+  const closeBtn=document.createElement('button');closeBtn.type='button';closeBtn.className='merch-lightbox__close';closeBtn.setAttribute('aria-label','Закрыть фото');closeBtn.textContent='✕';
+  const prev=document.createElement('button');prev.type='button';prev.className='merch-lightbox__nav merch-lightbox__nav--prev';prev.setAttribute('aria-label','Предыдущее фото');prev.textContent='‹';
+  const next=document.createElement('button');next.type='button';next.className='merch-lightbox__nav merch-lightbox__nav--next';next.setAttribute('aria-label','Следующее фото');next.textContent='›';
+  const count=document.createElement('div');count.className='merch-lightbox__count';
+  viewer.append(img,closeBtn,prev,next,count);
+  const show=i=>{
+    index=(i+photos.length)%photos.length;
+    img.src=photos[index];img.alt='Фото товара '+(index+1);
+    count.textContent=(index+1)+' из '+photos.length;
+    viewer.classList.toggle('is-single',photos.length<2);
+  };
+  const close=()=>{
+    document.removeEventListener('keydown',onKey);
+    viewer.remove();
+    closeLightbox=null;
+  };
+  const onKey=event=>{
+    if(event.key==='Escape'){event.preventDefault();close();}
+    else if(event.key==='ArrowLeft'){show(index-1);}
+    else if(event.key==='ArrowRight'){show(index+1);}
+  };
+  closeBtn.addEventListener('click',close);
+  prev.addEventListener('click',()=>show(index-1));
+  next.addEventListener('click',()=>show(index+1));
+  viewer.addEventListener('click',event=>{if(event.target===viewer)close();});
+  document.addEventListener('keydown',onKey);
+  closeLightbox=close;
+  show(index);
+  host.append(viewer);
+  closeBtn.focus();
+}
+$('#merchDialog').addEventListener('cancel',event=>{
+  if(closeLightbox){event.preventDefault();closeLightbox();}
+});
+$('#merchDialog').addEventListener('close',()=>{if(closeLightbox)closeLightbox();});
 /* Advertising rates: opened from the cooperation block on the home page. */
 $('#adRatesOpen').addEventListener('click',()=>$('#adRatesDialog').showModal());
 $('#adRatesClose').addEventListener('click',()=>$('#adRatesDialog').close());
