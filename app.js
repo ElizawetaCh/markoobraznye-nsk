@@ -116,21 +116,44 @@ function eventParts(value){
 function emptyHint(text){
  const hint=document.createElement('p');hint.className='hint';hint.textContent=text;return hint;
 }
+function eventDayKey(value){
+ const raw=String(value||'').slice(0,10);
+ return /^\d{4}-\d{2}-\d{2}$/.test(raw)?raw:'';
+}
+function todayKey(){
+ const now=new Date();
+ return now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+}
+function makeEventCard(event,archived){
+ const card=document.createElement('article');card.className='event-card'+(archived?' event-card--past':'');
+ const parts=eventParts(event.date);
+ const dayBox=document.createElement('div');dayBox.className='day';dayBox.append(document.createTextNode(parts.day));
+ const small=document.createElement('small');small.textContent=parts.month;dayBox.append(small);
+ const body=document.createElement('div');body.className='event-body';
+ if(archived){const pastBadge=document.createElement('span');pastBadge.className='badge badge--past';pastBadge.textContent='ПРОШЛО';body.append(pastBadge)}
+ if(event.badge){const badge=document.createElement('span');badge.className='badge';badge.textContent=event.badge;body.append(badge)}
+ const title=document.createElement('h3');title.textContent=event.title||'Мероприятие';body.append(title);
+ const text=document.createElement('p');text.textContent=event.text||'';body.append(text);
+ card.append(dayBox,body);return card;
+}
 function renderEvents(){
  const list=$('#eventList');if(!list)return;
- const events=(content().events||[]).slice().sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
- if(!events.length){list.replaceChildren(emptyHint('Пока нет запланированных встреч. Администраторы добавят их в админ-панели.'));return}
- list.replaceChildren(...events.map(event=>{
-  const card=document.createElement('article');card.className='event-card';
-  const parts=eventParts(event.date);
-  const dayBox=document.createElement('div');dayBox.className='day';dayBox.append(document.createTextNode(parts.day));
-  const small=document.createElement('small');small.textContent=parts.month;dayBox.append(small);
-  const body=document.createElement('div');body.className='event-body';
-  if(event.badge){const badge=document.createElement('span');badge.className='badge';badge.textContent=event.badge;body.append(badge)}
-  const title=document.createElement('h3');title.textContent=event.title||'Мероприятие';body.append(title);
-  const text=document.createElement('p');text.textContent=event.text||'';body.append(text);
-  card.append(dayBox,body);return card;
- }));
+ const archive=$('#eventArchive'),archiveList=$('#eventArchiveList');
+ const today=todayKey();
+ const upcoming=[],past=[];
+ (content().events||[]).forEach(event=>{
+  const day=eventDayKey(event.date);
+  if(day&&day<today)past.push(event);else upcoming.push(event);
+ });
+ upcoming.sort((a,b)=>(eventDayKey(a.date)||'9999-12-31').localeCompare(eventDayKey(b.date)||'9999-12-31'));
+ past.sort((a,b)=>eventDayKey(b.date).localeCompare(eventDayKey(a.date)));
+ const emptyText=past.length
+  ?'Ближайших встреч пока нет. Прошедшие мероприятия — в архиве ниже.'
+  :'Пока нет запланированных встреч. Администраторы добавят их в админ-панели.';
+ list.replaceChildren(...(upcoming.length?upcoming.map(event=>makeEventCard(event,false)):[emptyHint(emptyText)]));
+ if(!archive||!archiveList)return;
+ if(!past.length){archive.hidden=true;archiveList.replaceChildren();return}
+ archive.hidden=false;archiveList.replaceChildren(...past.map(event=>makeEventCard(event,true)));
 }
 function renderAdmins(){
  const list=$('#adminList');if(!list)return;
