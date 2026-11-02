@@ -37,6 +37,26 @@ dialog{max-width:min(600px,95vw);max-height:85vh;overflow:auto;border:1px solid 
 .coop-section + .social-section{margin-top:16px}
 @media(max-width:700px){.coop-section{padding:18px}.coop-actions{width:100%}.coop-actions .btn{flex:1 1 160px}}
 
+/* Advertising rates popup: three formats and a price request. */
+#adRatesDialog{position:relative;max-width:min(760px,95vw);max-height:90vh;padding:0;border-radius:18px;overflow:auto;background:#141a23;overscroll-behavior:contain}
+#adRatesDialog .closebtn{position:absolute;right:12px;top:10px;z-index:2;padding:6px 8px;font-size:1.2rem;border-radius:9px}
+#adRatesDialog .closebtn:focus-visible{outline:2px solid rgba(255,142,156,.6);outline-offset:2px}
+.rates-modal{padding:24px 24px 22px}
+.rates-modal h2{margin:6px 0 6px;padding-right:30px;font-size:var(--fs-2);letter-spacing:-.03em}
+.rates-modal__lead{margin:0 0 18px;max-width:560px;color:#b6c0ca;font-size:var(--fs-5);line-height:1.55}
+.rates-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.rate-card{position:relative;display:flex;flex-direction:column;gap:8px;padding:18px 16px 16px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:linear-gradient(155deg,#222b37,#12171f)}
+.rate-card--featured{border-color:rgba(231,83,99,.5);background:radial-gradient(ellipse at 90% 0%,rgba(226,96,137,.18),transparent 55%),linear-gradient(155deg,#2a2430,#151016)}
+.rate-card__badge{position:absolute;right:11px;top:11px;padding:3px 8px;border-radius:999px;border:1px solid rgba(231,83,99,.5);background:rgba(215,39,53,.22);color:#ffb3bc;font-size:var(--fs-7);font-weight:800;letter-spacing:.07em}
+.rate-card__icon{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#ff9aa8;font-size:1.2rem}
+.rate-card h3{margin:2px 0 0;font-size:var(--fs-4)}
+.rate-card p{margin:0;color:#aeb8c3;font-size:var(--fs-6);line-height:1.5}
+.rate-card__meta{margin-top:auto;padding-top:10px;color:#f290a6;font-size:var(--fs-7);font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.rates-modal__actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.rates-modal__actions .btn{flex:1 1 200px;margin:0}
+.rates-modal__note{margin:12px 0 0;color:#8f9ba8;font-size:var(--fs-7)}
+@media(max-width:640px){.rates-grid{grid-template-columns:1fr}.rates-modal{padding:22px 16px 18px}}
+
 /* Club social links: three scannable QRs, swipeable on small screens. */
 /* Club social links: compact cards with a small QR, at the end of the home page. */
 .social-section{margin:36px 0 24px;padding:16px 18px;border-radius:21px;border:1px solid rgba(245,245,245,.12);background:radial-gradient(ellipse at 96% 4%,rgba(226,96,137,.14),transparent 45%),linear-gradient(145deg,#1c232b,#10141b);box-shadow:0 14px 38px #0002}
