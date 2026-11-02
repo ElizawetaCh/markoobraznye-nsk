@@ -313,6 +313,11 @@ function openMerch(product){
 }
 $('#closeMerch').addEventListener('click',()=>$('#merchDialog').close());
 $('#merchDialog').addEventListener('click',event=>{if(event.target===$('#merchDialog'))$('#merchDialog').close()});
+/* Advertising rates: opened from the cooperation block on the home page. */
+$('#adRatesOpen').addEventListener('click',()=>$('#adRatesDialog').showModal());
+$('#adRatesClose').addEventListener('click',()=>$('#adRatesDialog').close());
+$('#adRatesCancel').addEventListener('click',()=>$('#adRatesDialog').close());
+$('#adRatesDialog').addEventListener('click',event=>{if(event.target===$('#adRatesDialog'))$('#adRatesDialog').close()});
 /* Photo albums: the card and the dialog use the same cover from photos-data.js. */
 const PHOTO_FALLBACK='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360"><rect width="640" height="360" fill="#1b2430"/><g fill="none" stroke="#f290a6" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M200 150h48l24-36h96l24 36h48v130H200z"/><circle cx="320" cy="212" r="40"/></g></svg>');
 function renderPhotos(){
