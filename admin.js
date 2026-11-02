@@ -240,7 +240,6 @@
         { name: 'name', label: 'Название', type: 'text', required: true, placeholder: 'Название компании' },
         { name: 'description', label: 'Коротко о партнёре', type: 'textarea', rows: 3, placeholder: 'Чем занимается и чем помогает клубу' },
         { name: 'url', label: 'Ссылка', type: 'url', placeholder: 'https://...' },
-        { name: 'telegram', label: 'Telegram', type: 'text', placeholder: '@username или https://t.me/...', hint: 'Контакт для связи. На карточке появится кнопка «Написать в Telegram».' },
         { name: 'logo', label: 'Логотип', type: 'image', hint: 'Необязательно. Без логотипа покажем первую букву названия.' }
       ],
       empty: () => ({}),
@@ -248,12 +247,11 @@
         name: values.name.trim(),
         description: values.description.trim(),
         url: values.url.trim(),
-        telegram: values.telegram.trim(),
         logo: image || null
       }),
       row: item => ({
         title: item.name,
-        meta: [item.url, item.telegram].filter(Boolean).join(' · ') || item.description || '',
+        meta: item.url || item.description || '',
         thumb: item.logo,
         fallback: (item.name || '?').trim().charAt(0).toUpperCase()
       })
