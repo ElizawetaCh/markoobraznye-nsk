@@ -1,14 +1,11 @@
 (() => {
 'use strict';
-const OWNER='kiberdoker-pixel';
-const REPO='markoobraznye-nsk';
-const API='https://api.github.com/repos/'+OWNER+'/'+REPO+'/issues?state=open&per_page=50&sort=created&direction=desc';
 const $=q=>document.querySelector(q);
 const $$=q=>Array.from(document.querySelectorAll(q));
 const onboard=$('#onboard'),screen=$('#screen'),remember=$('#remember');
 const saved=(()=>{try{return JSON.parse(localStorage.getItem('mnsk_pwa_preferences'))||{}}catch{return {}}})();
 const labels={home:['КЛУБНОЕ ПРИЛОЖЕНИЕ','Главная'],calendar:['ПЛАНЫ И ВСТРЕЧИ','Календарь мероприятий'],news:['ЖИЗНЬ КЛУБА','Новости'],admins:['ЛЮДИ И МАШИНЫ','Администраторы'],photos:['ЖИЗНЬ КЛУБА В КАДРАХ','Фотоотчеты'],partners:['НАШИ ДРУЗЬЯ','Партнёры'],merch:['КЛУБНАЯ АТРИБУТИКА','Мерч'],admin:['УПРАВЛЕНИЕ','Админ-панель']};
-let current='home',mode='member',cachedNews=[],loading=false,lastFetched=0;
+let current='home',mode='member';
 const content=()=>window.ContentStore.get();
 function applyMode(){
   document.body.dataset.mode=mode;
@@ -20,12 +17,62 @@ function login(member) {
   if(remember.checked) {try{localStorage.setItem('mnsk_pwa_preferences',JSON.stringify({mode}))}catch{}}
   onboard.classList.add('hidden');screen.classList.remove('hidden');
   applyMode();
-  goto(member?'home':'admin'); loadNews();
+  goto(member?'home':'admin');
+}
+function welcome() {
+  mode='member';
+  localStorage.removeItem('mnsk_pwa_preferences');
+  screen.classList.add('hidden');onboard.classList.remove('hidden');
+  applyMode();
+  window.scrollTo(0,0);
 }
 $('#memberStart').addEventListener('click',()=>login(true));
-$('#adminStart').addEventListener('click',()=>login(false));
-$('#settings').addEventListener('click',()=>{
-  localStorage.removeItem('mnsk_pwa_preferences');screen.classList.add('hidden');onboard.classList.remove('hidden');window.scrollTo(0,0);
+
+/* Вход администратора: e-mail и пароль из Supabase Auth. */
+const loginDialog=$('#adminLoginDialog'),loginForm=$('#adminLoginForm'),loginStatus=$('#adminLoginStatus');
+function showLogin(message) {
+  if(!loginDialog||!loginForm)return;
+  loginForm.reset();
+  loginStatus.hidden=!message;
+  loginStatus.textContent=message||'';
+  loginStatus.classList.toggle('is-error',Boolean(message));
+  loginDialog.showModal();
+  setTimeout(()=>$('#adminEmail').focus(),60);
+}
+$('#adminStart').addEventListener('click',()=>showLogin());
+$('#adminLoginClose').addEventListener('click',()=>loginDialog.close());
+$('#adminLoginCancel').addEventListener('click',()=>loginDialog.close());
+loginDialog.addEventListener('click',event=>{if(event.target===loginDialog)loginDialog.close()});
+loginForm.addEventListener('submit',async event=>{
+  event.preventDefault();
+  const email=$('#adminEmail').value.trim();
+  const password=$('#adminPassword').value;
+  if(!email||!password){
+    loginStatus.hidden=false;loginStatus.textContent='Введите e-mail и пароль.';loginStatus.classList.add('is-error');return;
+  }
+  if(!window.ContentStore||!window.ContentStore.signIn){
+    loginStatus.hidden=false;loginStatus.textContent='Сервис входа не загрузился. Обновите страницу.';loginStatus.classList.add('is-error');return;
+  }
+  const submit=$('#adminLoginSubmit');
+  submit.disabled=true;submit.textContent='Вход…';
+  loginStatus.hidden=true;
+  try{
+    await window.ContentStore.signIn(email,password);
+    loginDialog.close();
+    login(false);
+  }catch(error){
+    loginStatus.hidden=false;
+    loginStatus.textContent=error.message||'Не удалось войти.';
+    loginStatus.classList.add('is-error');
+  }finally{
+    submit.disabled=false;submit.textContent='Войти';
+  }
+});
+$('#settings').addEventListener('click',async()=>{
+  if(window.ContentStore&&window.ContentStore.isEditor()&&window.ContentStore.signOut){
+    try{await window.ContentStore.signOut()}catch{}
+  }
+  welcome();
 });
 $('#adminOpen').addEventListener('click',()=>goto('admin'));
 $$('[data-to]').forEach(btn=>btn.addEventListener('click',()=>goto(btn.getAttribute('data-to'))));
@@ -37,46 +84,7 @@ function goto(id){
   $$('.bottom [data-to]').forEach(el=>el.classList.toggle('current',el.dataset.to===id));
   $('#pageKicker').textContent=labels[id][0];$('#pageTitle').textContent=labels[id][1];
   window.scrollTo({top:0,behavior:'instant'});
-  if(id==='news'||id==='home')loadNews();
-}
-function safeUrl(str){
- try{const u=new URL(str);return u.protocol==='https:'?u.href:null}catch{return null}
-}
-function pictureFromText(body){
-  const match=body.match(/!\[[^\]]*\]\((https:\/\/[^)\s]+)\)/i) || body.match(/(https:\/\/(?:github\.com\/user-attachments\/assets\/|user-images\.githubusercontent\.com\/)[^\s<)]+)/i);
-  return match?safeUrl(match[1]):null;
-}
-function extractText(body){
-  const block=body.match(/###\s*Текст новости\s*\n+([\s\S]*?)(?=\n###\s|$)/i);
-  let x=block?block[1]:body;
-  return x.replace(/!\[[^\]]*\]\(https?:\/\/[^)]+\)/g,'').replace(/\[([^\]]+)\]\(https?:\/\/[^)]+\)/g,'$1').replace(/<!--[\s\S]*?-->/g,'').replace(/^###.+$/gm,'').trim().slice(0,5000);
-}
-function sampleNews(){
-  return [{id:'demo',date:'2026-10-23',title:'Добро пожаловать в тестовую версию',text:'Это пример публикации. Когда владелец клуба создаст в GitHub первую новость, она автоматически появится здесь на всех телефонах. Для обновления не потребуется новая установка.',picture:null,isDemo:true,url:null}];
-}
-async function loadNews(force=false){
- if(loading)return;
- if(!force && Date.now()-lastFetched<45000){renderNews();return}
- loading=true;
- $('#news-status').textContent='Получаем свежие новости…';
- try{
-   const resp=await fetch(API,{headers:{Accept:'application/vnd.github+json'},cache:'no-store'});
-   if(!resp.ok)throw new Error('GitHub API: '+resp.status);
-   const arr=await resp.json();
-   cachedNews=arr.filter(issue=>{
-      if(issue.pull_request||!issue.title.toUpperCase().startsWith('[НОВОСТЬ]'))return false;
-      return issue.user?.login?.toLowerCase()===OWNER || (issue.labels||[]).some(x=>x.name?.toLowerCase()==='published');
-   }).map(issue=>({
-      id:issue.id,title:issue.title.replace(/^\[НОВОСТЬ\]\s*/i,'').trim(),
-      date:issue.created_at.slice(0,10),text:extractText(issue.body||''),
-      picture:pictureFromText(issue.body||''),url:issue.html_url,isDemo:false
-   }));
-   lastFetched=Date.now();
-   $('#news-status').textContent='Публикации обновлены · '+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
- }catch(e){
-   $('#news-status').textContent='Не удалось проверить новости в GitHub. Проверьте интернет и публичность репозитория.';
-   console.warn('News fetch:',e);
- }finally{loading=false;renderNews()}
+  if(id==='news'||id==='home')renderNews();
 }
 function makeCard(item){
  const card=document.createElement('article');card.className='news-card';
@@ -94,16 +102,29 @@ function makeCard(item){
  return card;
 }
 function localNews(){
- return (content().news||[]).map(item=>({...item,local:true,isDemo:false,url:null}));
-}
-function allNews(){
- return [...localNews(),...cachedNews].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+ return (content().news||[])
+  .map(item=>({...item,local:true,isDemo:false,url:null}))
+  .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
 }
 function renderNews(){
- const items=allNews();
- const list=items.length?items:sampleNews();
- for(const [target,shown] of [['#news-list',list],['#home-news',list.slice(0,2)]]){
-  const area=$(target);area.replaceChildren();shown.forEach(x=>area.append(makeCard(x)));
+ const items=localNews();
+ for(const [target,shown] of [['#news-list',items],['#home-news',items.slice(0,2)]]){
+  const area=$(target);if(!area)continue;
+  area.replaceChildren();
+  if(!shown.length){area.append(emptyHint('Пока нет публикаций. Новости клуба появятся здесь.'));continue}
+  shown.forEach(x=>area.append(makeCard(x)));
+ }
+ const status=$('#news-status');
+ if(status)status.textContent=items.length?'Публикации клуба · обновляются автоматически':'Публикаций пока нет';
+}
+function refreshNews(){
+ const status=$('#news-status');
+ if(status)status.textContent='Обновляем…';
+ if(window.ContentStore&&window.ContentStore.refresh){
+  window.ContentStore.refresh().then(ok=>{
+   const st=$('#news-status');if(!st)return;
+   st.textContent=ok?'Публикации клуба · обновлены только что':'Нет связи с сервером. Показаны последние сохранённые новости.';
+  }).catch(()=>{});
  }
 }
 /* Calendar, administrators and partners are public views of the same content store. */
@@ -214,15 +235,47 @@ function openStory(item){
  }
  $('#storyDialog').showModal();
 }
-$('#refreshNews').addEventListener('click',()=>loadNews(true));
+$('#refreshNews').addEventListener('click',refreshNews);
 $('#closeDialog').addEventListener('click',()=>$('#storyDialog').close());
-document.addEventListener('visibilitychange',()=>{if(!document.hidden && !screen.classList.contains('hidden'))loadNews()});
-if(saved.mode==='member'||saved.mode==='admin'){
- mode=saved.mode;applyMode();
- onboard.classList.add('hidden');screen.classList.remove('hidden');goto(mode==='member'?'home':'admin');loadNews();
+
+/* Восстановление входа: участник входит сразу, администратор — только
+   после проверки сессии Supabase и прав редактора. */
+async function restoreMode(){
+ if(saved.mode==='member'){
+  onboard.classList.add('hidden');screen.classList.remove('hidden');
+  mode='member';applyMode();goto('home');
+  return;
+ }
+ if(saved.mode!=='admin'){applyMode();return}
+ let timedOut=false;
+ try{
+  if(window.ContentStore&&window.ContentStore.ready){
+   timedOut=await Promise.race([
+    window.ContentStore.ready.then(()=>false),
+    new Promise(resolve=>setTimeout(()=>resolve(true),6000))
+   ]);
+  }
+ }catch(error){console.warn('Auth restore:',error)}
+ if(timedOut){applyMode();return}
+ if(mode==='admin')return;
+ if(window.ContentStore&&window.ContentStore.isEditor()){
+  mode='admin';
+  onboard.classList.add('hidden');screen.classList.remove('hidden');
+  applyMode();goto('admin');
+ }else{
+  welcome();
+ }
 }
+document.addEventListener('auth:changed',event=>{
+ const detail=event.detail||{};
+ if(detail.event==='SIGNED_OUT'&&mode==='admin'){
+  mode='member';applyMode();
+  if(!screen.classList.contains('hidden'))goto('home');
+ }
+});
 applyMode();
 renderNews();
+restoreMode();
 /* Merch: the home rail and the merch page are drawn from the same merch-data.js. */
 const MERCH_ICONS={
   shirt:'<path d="M8 3.5 3.5 6.6l2.2 3.2L8 8.7V20.5h8V8.7l2.3 1.1 2.2-3.2L16 3.5l-2 1.6h-4L8 3.5Z"/>',
