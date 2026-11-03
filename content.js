@@ -41,22 +41,7 @@
     return {
       version: 1,
       news: [],
-      events: [
-        {
-          id: 'ev-club-meeting',
-          date: '2026-10-31',
-          badge: 'ПРИМЕР',
-          title: 'Клубная встреча',
-          text: 'Тестовая запись. Адрес и время будут уточнены.'
-        },
-        {
-          id: 'ev-club-quest',
-          date: '2026-11-07',
-          badge: 'ПРИМЕР',
-          title: 'Клубный квест',
-          text: 'Демонстрация карточки мероприятия. Это не настоящий анонс.'
-        }
-      ],
+      events: [],
       photos: clone(window.PHOTO_ALBUMS || []),
       merch: clone(window.MERCH_PRODUCTS || []),
       admins: [
