@@ -234,13 +234,18 @@ $('#closeDialog').addEventListener('click',()=>$('#storyDialog').close());
 
 /* Восстановление входа: участник входит сразу, администратор — только
    после проверки сессии Supabase и прав редактора. */
+function hasStoredSession(){
+ try{
+  return Object.keys(localStorage).some(key=>key.startsWith('sb-')&&key.endsWith('-auth-token'));
+ }catch{return false}
+}
 async function restoreMode(){
  if(saved.mode==='member'){
   onboard.classList.add('hidden');screen.classList.remove('hidden');
   mode='member';applyMode();goto('home');
   return;
  }
- if(saved.mode!=='admin'){applyMode();return}
+ if(saved.mode!=='admin'&&!hasStoredSession()){applyMode();return}
  let timedOut=false;
  try{
   if(window.ContentStore&&window.ContentStore.ready){
@@ -252,13 +257,26 @@ async function restoreMode(){
  }catch(error){console.warn('Auth restore:',error)}
  if(timedOut){applyMode();return}
  if(mode==='admin')return;
- if(window.ContentStore&&window.ContentStore.isEditor()){
+ const store=window.ContentStore;
+ let editor=Boolean(store&&store.isEditor());
+ if(!editor&&store&&store.session&&store.session()&&store.refreshRole){
+  try{editor=Boolean(await store.refreshRole())}catch(error){console.warn('Role restore:',error)}
+ }
+ if(editor){
   mode='admin';
   onboard.classList.add('hidden');screen.classList.remove('hidden');
   applyMode();goto('admin');
- }else{
-  welcome();
+  return;
  }
+ if(saved.mode==='admin'&&store&&store.session&&store.session()){
+  /* Сессия есть, но права не подтвердились. Не стираем настройку входа:
+     при следующем открытии приложение попробует снова. */
+  mode='member';
+  screen.classList.add('hidden');onboard.classList.remove('hidden');
+  applyMode();window.scrollTo(0,0);
+  return;
+ }
+ welcome();
 }
 document.addEventListener('auth:changed',event=>{
  const detail=event.detail||{};
