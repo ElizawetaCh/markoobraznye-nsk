@@ -7,7 +7,7 @@
 <meta name="description" content="Новости, мероприятия и жизнь автоклуба Маркообразные Новосибирск">
 <link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon-192-v3.png" type="image/png">
 <link rel="stylesheet" href="./style.css">
-<title>Маркообразные Новосибирск — тестовое PWA</title>
+<title>Маркообразные Новосибирск — клубное приложение</title>
 </head>
 <body>
 <div class="petals" aria-hidden="true"></div>
@@ -38,7 +38,7 @@
 <button class="btn primary" id="memberStart">Продолжить как участник ↗</button>
 <button class="btn outlined" id="adminStart">Войти как администратор</button>
 <label class="remember"><input id="remember" type="checkbox" checked> Больше не показывать этот экран</label>
-<div class="smallmuted">Предварительная версия для пяти тестировщиков</div>
+<div class="smallmuted">Клубное приложение · Новосибирск</div>
 <footer class="kapibara-credit" aria-label="Создатель приложения"><span>© 2026 Kapibara AI</span></footer>
 </div></section>
 <section id="screen" class="screen hidden">
@@ -206,6 +206,26 @@
 <p id="confirmText"></p>
 <div class="confirm-actions"><button id="confirmCancel" class="btn outlined" type="button">Отмена</button><button id="confirmOk" class="btn primary" type="button">Удалить</button></div>
 </dialog>
+<dialog id="adminLoginDialog" class="login-dialog" aria-labelledby="adminLoginTitle">
+<button id="adminLoginClose" class="closebtn" type="button" aria-label="Закрыть вход">✕</button>
+<form id="adminLoginForm" class="login-form" novalidate>
+  <div class="eyebrow">АДМИН-ПАНЕЛЬ</div>
+  <h2 id="adminLoginTitle">Вход для администратора</h2>
+  <p class="hint">Доступ есть только у редакторов клуба. Логин и пароль выдаёт владелец.</p>
+  <label class="login-field">E-mail
+    <input id="adminEmail" type="email" autocomplete="username" inputmode="email" required placeholder="name@example.com">
+  </label>
+  <label class="login-field">Пароль
+    <input id="adminPassword" type="password" autocomplete="current-password" required placeholder="••••••••">
+  </label>
+  <p id="adminLoginStatus" class="login-status" aria-live="polite" hidden></p>
+  <div class="login-actions">
+    <button id="adminLoginSubmit" class="btn primary" type="submit">Войти</button>
+    <button id="adminLoginCancel" class="btn outlined" type="button">Отмена</button>
+  </div>
+  <p class="login-note">Забыли пароль? Попросите владельца клуба сбросить его в Supabase.</p>
+</form>
+</dialog>
 <dialog id="adRatesDialog" class="rates-dialog" aria-labelledby="adRatesTitle">
 <button id="adRatesClose" class="closebtn" type="button" aria-label="Закрыть тарифы">✕</button>
 <div class="rates-modal">
@@ -241,6 +261,7 @@
 </div>
 </dialog>
 <div id="adminToast" class="admin-toast" role="status" aria-live="polite" hidden></div>
+<script src="./vendor/supabase.js" defer></script>
 <script src="./social-qr.js" defer></script>
 <script src="./merch-data.js" defer></script>
 <script src="./photos-data.js" defer></script>
