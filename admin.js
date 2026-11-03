@@ -778,6 +778,7 @@
   document.addEventListener('content:error', () => toast('Не хватает места в браузере. Уменьшите фото или удалите старые записи.', true));
   document.addEventListener('content:sync-error', () => toast('Не удалось отправить изменения на сервер. Проверьте интернет — повторим автоматически.', true));
   document.addEventListener('content:denied', () => toast('Нет доступа. Войдите как администратор.', true));
+  document.addEventListener('content:migration-error', () => toast('Не удалось перенести старые фото в облако. Проверьте интернет и обновите страницу.', true));
   document.addEventListener('content:synced', () => toast('Сохранено для всех'));
   renderAdmin();
 })();
