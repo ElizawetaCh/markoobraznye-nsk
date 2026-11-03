@@ -29,7 +29,7 @@
     try {
       if (!window.supabase || typeof window.supabase.createClient !== 'function') return null;
       return window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+        auth: { persistSession: true, autoRefreshToken: false, detectSessionInUrl: true }
       });
     } catch (error) {
       console.warn('Supabase client:', error);
@@ -167,6 +167,7 @@
 
   async function pushSections(sections) {
     if (!client || !session) return false;
+    await ensureFreshSession();
     const unique = Array.from(new Set(sections)).filter(key => LISTS.includes(key));
     if (!unique.length) return true;
     const payload = unique.map(section => ({ section, items: data[section] }));
@@ -373,6 +374,25 @@
     return text || 'Не удалось войти.';
   }
 
+  /* Сессия обновляется по требованию, а не фоновым таймером: так вкладка
+     не тратит запросы впустую, а права проверяются перед каждой записью. */
+  async function ensureFreshSession() {
+    if (!client || !session) return null;
+    const expires = Number(session.expires_at || 0);
+    if (!expires || expires - 60 > Date.now() / 1000) return session;
+    try {
+      const { data, error } = await client.auth.refreshSession();
+      if (error) throw error;
+      if (data && data.session) {
+        session = data.session;
+        emit('auth:changed', { event: 'TOKEN_REFRESHED', session, role: editorRole });
+      }
+    } catch (error) {
+      console.warn('Session refresh:', error);
+    }
+    return session;
+  }
+
   let rolePromise = null;
 
   async function resolveRole() {
@@ -476,7 +496,10 @@
     try {
       const { data: auth } = await client.auth.getSession();
       session = auth && auth.session ? auth.session : null;
-      if (session) await resolveRole();
+      if (session) {
+        await ensureFreshSession();
+        await resolveRole();
+      }
       client.auth.onAuthStateChange((event, nextSession) => {
         session = nextSession || null;
         if (event === 'SIGNED_OUT' || !session) {
@@ -503,6 +526,7 @@
   async function uploadImage(dataUrl) {
     if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:')) return dataUrl;
     if (!client || !canWrite()) throw new Error('Нет доступа к загрузке фото');
+    await ensureFreshSession();
     const response = await fetch(dataUrl);
     const blob = await response.blob();
     const type = blob.type || 'image/webp';
