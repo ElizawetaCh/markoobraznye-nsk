@@ -169,7 +169,7 @@ function renderEvents(){
  past.sort((a,b)=>eventDayKey(b.date).localeCompare(eventDayKey(a.date)));
  const emptyText=past.length
   ?'Ближайших встреч пока нет. Прошедшие мероприятия — в архиве ниже.'
-  :'Пока нет запланированных встреч. Администраторы добавят их в админ-панели.';
+  :'Пока нет запланированных встреч. Следите за анонсами в новостях клуба.';
  list.replaceChildren(...(upcoming.length?upcoming.map(event=>makeEventCard(event,false)):[emptyHint(emptyText)]));
  if(!archive||!archiveList)return;
  if(!past.length){archive.hidden=true;archiveList.replaceChildren();return}
@@ -322,6 +322,8 @@ function merchVisual(product,className){
 }
 function renderMerch(){
   const products=Array.isArray(content().merch)?content().merch:[];
+  const teaser=$('.merch-teaser');
+  if(teaser)teaser.hidden=!products.length;
   const rail=$('#merchRail');
   if(rail){
     rail.replaceChildren(...products.map(p=>{
@@ -333,7 +335,9 @@ function renderMerch(){
     }));
   }
   const grid=$('#merchGrid');
-  if(grid){
+  if(grid&&!products.length){
+    grid.replaceChildren(emptyHint('Мерч клуба скоро появится. Следите за анонсами.'));
+  }else if(grid){
     grid.replaceChildren(...products.map(p=>{
       const card=document.createElement('button');
       card.type='button';card.className='merch-card';
@@ -509,6 +513,10 @@ function renderPhotos(){
   const grid=$('#photoGrid');
   if(!grid)return;
   const albums=Array.isArray(content().photos)?content().photos:[];
+  if(!albums.length){
+    grid.replaceChildren(emptyHint('Фотоотчёты появятся после ближайших встреч клуба.'));
+    return;
+  }
   grid.replaceChildren(...albums.map(album=>{
     const card=document.createElement('button');
     card.type='button';card.className='photo-card';
