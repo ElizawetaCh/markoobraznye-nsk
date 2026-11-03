@@ -1,5 +1,5 @@
 /* Network-first HTML, cache static files; shared content comes from Supabase. */
-const VERSION='mnsk-club-v30-final-copy';
+const VERSION='mnsk-club-v31-auth-restore';
 const BASE=new URL('./',self.registration.scope).href;
 const STATIC=['./','./index.html','./style.css','./app.js','./merch-data.js','./photos-data.js','./content.js','./admin.js','./social-qr.js','./install.js','./vendor/supabase.js','./assets/sakura-evening.webp','./assets/sakura-branches.svg','./assets/club-logo-official-hq.svg','./assets/admin-mikhail.webp','./assets/admin-irina.webp','./assets/admin-ekaterina.webp','./manifest.webmanifest','./icon-192-v3.png','./icon-512-v3.png'];
 self.addEventListener('install',ev=>ev.waitUntil(caches.open(VERSION).then(c=>c.addAll(STATIC)).then(()=>self.skipWaiting())));
