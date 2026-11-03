@@ -620,3 +620,18 @@ textarea.editor-input{resize:vertical;min-height:90px}
 .event-card--past h3{color:#dbe1e8}
 .event-card--past p{color:#98a3ae}
 .badge--past{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#aab4bf;margin-right:6px}
+
+
+/* Admin sign-in dialog */
+.login-dialog{max-width:min(430px,94vw);padding:26px}
+.login-form{display:flex;flex-direction:column;gap:14px}
+.login-form h2{margin:8px 0 0;font-size:var(--fs-2);letter-spacing:-.03em}
+.login-form .hint{margin:0}
+.login-field{display:flex;flex-direction:column;gap:7px;font-size:var(--fs-6);font-weight:800;color:#dfe5eb}
+.login-field input{width:100%;padding:13px 14px;border:1px solid #59616b;border-radius:11px;background:#0e141c;color:#fff;font:inherit;font-size:var(--fs-4)}
+.login-field input:focus{outline:2px solid rgba(230,60,73,.5);outline-offset:1px;border-color:#e63c49}
+.login-status{margin:0;padding:10px 12px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(255,255,255,.05);color:#dbe2e9;font-size:var(--fs-6);line-height:1.5}
+.login-status.is-error{border-color:rgba(224,56,68,.5);background:rgba(209,29,45,.14);color:#ff9aa5}
+.login-actions{display:flex;flex-wrap:wrap;gap:10px}
+.login-actions .btn{flex:1 1 150px;margin:0}
+.login-note{margin:0;color:var(--muted);font-size:var(--fs-7);line-height:1.5}
