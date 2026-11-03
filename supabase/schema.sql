@@ -17,6 +17,7 @@ create table if not exists public.editors (
 );
 
 alter table public.editors enable row level security;
+grant select on public.editors to authenticated;
 
 create or replace function public.is_editor()
 returns boolean
@@ -106,6 +107,8 @@ create table if not exists public.content (
 );
 
 alter table public.content enable row level security;
+grant select on public.content to anon, authenticated;
+grant insert, update, delete on public.content to authenticated;
 
 create or replace function public.touch_content()
 returns trigger
@@ -160,6 +163,7 @@ begin
 exception
   when duplicate_object then null;
   when undefined_object then null;
+  when insufficient_privilege then null;
 end;
 $$;
 
@@ -216,6 +220,8 @@ create table if not exists public.push_subscriptions (
 );
 
 alter table public.push_subscriptions enable row level security;
+grant insert on public.push_subscriptions to anon, authenticated;
+grant usage, select on sequence public.push_subscriptions_id_seq to anon, authenticated;
 
 drop policy if exists "anyone can subscribe to push" on public.push_subscriptions;
 create policy "anyone can subscribe to push"
