@@ -235,6 +235,25 @@
       });
   }
 
+  async function uploadDataUrls(value, cache) {
+    if (typeof value === 'string') {
+      if (!value.startsWith('data:image/')) return value;
+      if (!cache.has(value)) cache.set(value, uploadImage(value));
+      return cache.get(value);
+    }
+    if (Array.isArray(value)) {
+      return Promise.all(value.map(item => uploadDataUrls(item, cache)));
+    }
+    if (value && typeof value === 'object') {
+      const out = {};
+      for (const [key, item] of Object.entries(value)) {
+        out[key] = await uploadDataUrls(item, cache);
+      }
+      return out;
+    }
+    return value;
+  }
+
   async function refresh() {
     if (!client) return false;
     try {
@@ -249,8 +268,9 @@
 
       /* Однократный перенос данных, сделанных до появления общей базы:
          раздел переносится, только если на сервере он ещё совпадает с
-         исходным набором, а локальная копия отличается от него. */
-      const migrate = [];
+         исходным набором, а локальная копия отличается от него.
+         Старые фото в base64 сначала загружаются в Storage. */
+      let migrate = [];
       if (editorRole === 'owner') {
         const legacy = readLegacy();
         if (legacy) {
@@ -263,6 +283,22 @@
               migrate.push(key);
             }
           });
+        }
+      }
+      if (migrate.length) {
+        const serverSnapshot = clone(next);
+        try {
+          const uploaded = new Map();
+          for (const key of migrate) {
+            next[key] = await uploadDataUrls(next[key], uploaded);
+          }
+        } catch (error) {
+          console.warn('Content migration upload:', error);
+          emit('content:migration-error', error);
+          migrate.forEach(key => {
+            next[key] = serverSnapshot[key];
+          });
+          migrate = [];
         }
       }
 
