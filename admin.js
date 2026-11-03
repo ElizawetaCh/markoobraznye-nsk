@@ -510,30 +510,52 @@
     $('#editorTitle').textContent = item ? config.edit : config.add;
     $('#editorDialog').showModal();
 
-    form.onsubmit = event => {
+    form.onsubmit = async event => {
       event.preventDefault();
-      if (!form.reportValidity()) return;
+      if (!form.reportValidity() || save.disabled) return;
       const values = {};
       config.fields.forEach(field => {
         if (field.type === 'image' || field.type === 'images') return;
         const input = form.elements[field.name];
         values[field.name] = input ? input.value : '';
       });
-      const record = config.collect(values, imageWidget ? imageWidget.getValue() : null);
-      if (imagesWidget) record.photos = imagesWidget.getValue();
-      record.id = item ? item.id : uid(config.key);
-      const saved = store.update(data => {
-        const list = data[config.key];
-        const index = list.findIndex(entry => entry.id === record.id);
-        if (index >= 0) list[index] = record;
-        else list.unshift(record);
-      });
-      if (!saved) {
-        toast('Не удалось сохранить: не хватает места в браузере', true);
-        return;
+      save.disabled = true;
+      const label = save.textContent;
+      save.textContent = 'Сохраняем…';
+      try {
+        let image = imageWidget ? imageWidget.getValue() : null;
+        let photos = imagesWidget ? imagesWidget.getValue() : null;
+        const uploads = [];
+        if (typeof image === 'string' && image.startsWith('data:')) {
+          uploads.push(store.uploadImage(image).then(url => { image = url; }));
+        }
+        if (Array.isArray(photos)) {
+          photos = photos.slice();
+          photos.forEach((src, index) => {
+            if (typeof src === 'string' && src.startsWith('data:')) {
+              uploads.push(store.uploadImage(src).then(url => { photos[index] = url; }));
+            }
+          });
+        }
+        if (uploads.length) await Promise.all(uploads);
+        const record = config.collect(values, image);
+        if (photos) record.photos = photos;
+        record.id = item ? item.id : uid(config.key);
+        const saved = store.update(data => {
+          const list = data[config.key];
+          const index = list.findIndex(entry => entry.id === record.id);
+          if (index >= 0) list[index] = record;
+          else list.unshift(record);
+        });
+        if (!saved) throw new Error('Не удалось сохранить изменения. Проверьте вход и свободное место в браузере.');
+        $('#editorDialog').close();
+        toast(item ? 'Изменения сохранены' : 'Добавлено');
+      } catch (error) {
+        toast(error.message || 'Не удалось сохранить', true);
+      } finally {
+        save.disabled = false;
+        save.textContent = label;
       }
-      $('#editorDialog').close();
-      toast(item ? 'Изменения сохранены' : 'Добавлено');
     };
 
     const first = form.querySelector('input, textarea, select');
@@ -544,7 +566,7 @@
     const info = config.row(item) || {};
     openConfirm(
       'Удалить «' + (info.title || 'запись') + '»?',
-      'Запись исчезнет из приложения на этом устройстве.',
+      'Запись исчезнет из приложения у всех участников.',
       () => {
         const saved = store.update(data => {
           data[config.key] = data[config.key].filter(entry => entry.id !== item.id);
@@ -674,7 +696,9 @@
       '<p>Добавляйте и меняйте новости, мероприятия, фотоотчеты, мерч, администраторов и партнёров. Изменения сразу видны во всех разделах приложения.</p>';
     const note = document.createElement('p');
     note.className = 'admin-intro__note';
-    note.textContent = 'Данные хранятся в этом браузере. Чтобы перенести контент на другое устройство, скачайте резервную копию и загрузите её там же.';
+    const email = (store.session && store.session() && store.session().user && store.session().user.email) || '';
+    note.textContent = 'Данные хранятся в общей базе клуба и сразу появляются у всех администраторов и участников.' +
+      (email ? ' Вы вошли как ' + email + '.' : '');
     introCopy.append(note);
 
     const toolbar = document.createElement('div');
@@ -716,7 +740,7 @@
     resetButton.addEventListener('click', () => {
       openConfirm(
         'Сбросить всё к исходным данным?',
-        'Ваши изменения будут удалены. Это действие нельзя отменить.',
+        'Данные клуба вернутся к исходному набору у всех администраторов и участников. Это действие нельзя отменить.',
         () => {
           const saved = store.reset();
           toast(saved ? 'Данные сброшены' : 'Не удалось сбросить', !saved);
@@ -752,5 +776,8 @@
 
   document.addEventListener('content:changed', renderAdmin);
   document.addEventListener('content:error', () => toast('Не хватает места в браузере. Уменьшите фото или удалите старые записи.', true));
+  document.addEventListener('content:sync-error', () => toast('Не удалось отправить изменения на сервер. Проверьте интернет — повторим автоматически.', true));
+  document.addEventListener('content:denied', () => toast('Нет доступа. Войдите как администратор.', true));
+  document.addEventListener('content:synced', () => toast('Сохранено для всех'));
   renderAdmin();
 })();
