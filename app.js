@@ -5,7 +5,7 @@ const $$=q=>Array.from(document.querySelectorAll(q));
 const onboard=$('#onboard'),screen=$('#screen'),remember=$('#remember');
 const saved=(()=>{try{return JSON.parse(localStorage.getItem('mnsk_pwa_preferences'))||{}}catch{return {}}})();
 const labels={home:['КЛУБНОЕ ПРИЛОЖЕНИЕ','Главная'],calendar:['ПЛАНЫ И ВСТРЕЧИ','Календарь мероприятий'],news:['ЖИЗНЬ КЛУБА','Новости'],admins:['ЛЮДИ И МАШИНЫ','Администраторы'],photos:['ЖИЗНЬ КЛУБА В КАДРАХ','Фотоотчеты'],partners:['НАШИ ДРУЗЬЯ','Партнёры'],merch:['КЛУБНАЯ АТРИБУТИКА','Мерч'],admin:['УПРАВЛЕНИЕ','Админ-панель']};
-let current='home',mode='member';
+let current='home',mode='member',userChoseMember=false;
 const content=()=>window.ContentStore.get();
 function applyMode(){
   document.body.dataset.mode=mode;
@@ -14,6 +14,7 @@ function applyMode(){
 }
 function login(member) {
   mode=member?'member':'admin';
+  userChoseMember=Boolean(member);
   if(remember.checked) {try{localStorage.setItem('mnsk_pwa_preferences',JSON.stringify({mode}))}catch{}}
   onboard.classList.add('hidden');screen.classList.remove('hidden');
   applyMode();
@@ -256,7 +257,7 @@ async function restoreMode(){
   }
  }catch(error){console.warn('Auth restore:',error)}
  if(timedOut){applyMode();return}
- if(mode==='admin')return;
+ if(mode==='admin'||userChoseMember)return;
  const store=window.ContentStore;
  let editor=Boolean(store&&store.isEditor());
  if(!editor&&store&&store.session&&store.session()&&store.refreshRole){
