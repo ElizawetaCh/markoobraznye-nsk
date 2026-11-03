@@ -111,7 +111,7 @@
       fields: [
         { name: 'title', label: 'Название', type: 'text', required: true, placeholder: 'Клубная встреча' },
         { name: 'date', label: 'Дата', type: 'date', required: true },
-        { name: 'badge', label: 'Плашка', type: 'text', placeholder: 'ПРИМЕР или ОНЛАЙН', hint: 'Необязательно. Показывается над заголовком.' },
+        { name: 'badge', label: 'Плашка', type: 'text', placeholder: 'Например: ОНЛАЙН', hint: 'Необязательно. Показывается над заголовком.' },
         { name: 'text', label: 'Описание', type: 'textarea', required: true, rows: 4, placeholder: 'Где, во сколько и что будет' }
       ],
       empty: () => ({ date: todayIso(), badge: '' }),
