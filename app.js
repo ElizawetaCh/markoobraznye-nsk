@@ -89,21 +89,19 @@ function goto(id){
 function makeCard(item){
  const card=document.createElement('article');card.className='news-card';
  const meta=document.createElement('div');meta.className='date';
- meta.textContent=new Date(item.date+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})+(item.isDemo?' · ДЕМО':'');
+ meta.textContent=new Date(item.date+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
  card.append(meta);
  const title=document.createElement('h3');title.textContent=item.title;card.append(title);
  if(item.picture){const img=document.createElement('img');img.src=item.picture;img.loading='lazy';img.alt='Фотография публикации';img.referrerPolicy='no-referrer';card.append(img)}
  const teaserText=item.text||'';
  const teaser=document.createElement('p');teaser.textContent=teaserText.length>200?teaserText.slice(0,200)+'…':teaserText;card.append(teaser);
- if(!item.isDemo){
-   const btn=document.createElement('button');btn.className='link';btn.textContent='Подробнее →';
-   btn.addEventListener('click',()=>openStory(item));card.append(btn);
- }
+ const btn=document.createElement('button');btn.className='link';btn.textContent='Подробнее →';
+ btn.addEventListener('click',()=>openStory(item));card.append(btn);
  return card;
 }
 function localNews(){
  return (content().news||[])
-  .map(item=>({...item,local:true,isDemo:false,url:null}))
+  .map(item=>({...item,local:true}))
   .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
 }
 function renderNews(){
@@ -228,11 +226,7 @@ function openStory(item){
  const h=document.createElement('h2');h.textContent=item.title;content.append(h);
  if(item.picture){const img=document.createElement('img');img.src=item.picture;img.alt='Фото';content.append(img)}
  const p=document.createElement('p');p.textContent=item.text||'';content.append(p);
- if(item.url){
-   const src=document.createElement('a');src.href=item.url;src.target='_blank';src.rel='noopener';src.className='minilink';src.textContent='Открыть публикацию в GitHub ↗';content.append(src);
- }else{
-   const note=document.createElement('div');note.className='mini-note';note.textContent='Опубликовано в приложении клуба.';content.append(note);
- }
+ const note=document.createElement('div');note.className='mini-note';note.textContent='Опубликовано в приложении клуба.';content.append(note);
  $('#storyDialog').showModal();
 }
 $('#refreshNews').addEventListener('click',refreshNews);
