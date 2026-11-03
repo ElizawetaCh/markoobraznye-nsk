@@ -373,34 +373,60 @@
     return text || 'Не удалось войти.';
   }
 
+  let rolePromise = null;
+
   async function resolveRole() {
     roleError = null;
     if (!client || !session) {
       editorRole = null;
       return null;
     }
-    try {
-      /* Первый вошедший редактор становится владельцем; для остальных
-         функция просто проверяет, есть ли доступ. */
-      await client.rpc('claim_owner');
+    if (rolePromise) return rolePromise;
+
+    rolePromise = (async () => {
       const email = String((session.user && session.user.email) || '').trim().toLowerCase();
       if (!email) {
         editorRole = null;
         return null;
       }
-      const { data: row, error } = await client
-        .from('editors')
-        .select('role,email')
-        .eq('email', email)
-        .maybeSingle();
-      if (error) throw error;
-      editorRole = row ? row.role : null;
-    } catch (error) {
-      console.warn('Role check:', error);
-      roleError = error;
-      editorRole = null;
+
+      /* Первый вошедший редактор становится владельцем; для остальных
+         функция просто проверяет, есть ли доступ. */
+      const check = async () => {
+        await client.rpc('claim_owner');
+        const { data: row, error } = await client
+          .from('editors')
+          .select('role,email')
+          .eq('email', email)
+          .maybeSingle();
+        if (error) throw error;
+        editorRole = row ? row.role : null;
+      };
+
+      try {
+        await check();
+      } catch (error) {
+        /* Токен мог устареть, пока вкладка была закрыта. Обновляем сессию
+           и пробуем ещё раз, чтобы администратор не терял доступ. */
+        try {
+          const { data: refreshed, error: refreshError } = await client.auth.refreshSession();
+          if (refreshError) throw refreshError;
+          if (refreshed && refreshed.session) session = refreshed.session;
+          await check();
+        } catch (retryError) {
+          console.warn('Role check:', retryError);
+          roleError = retryError;
+          editorRole = null;
+        }
+      }
+      return editorRole;
+    })();
+
+    try {
+      return await rolePromise;
+    } finally {
+      rolePromise = null;
     }
-    return editorRole;
   }
 
   async function signIn(email, password) {
@@ -453,8 +479,18 @@
       if (session) await resolveRole();
       client.auth.onAuthStateChange((event, nextSession) => {
         session = nextSession || null;
-        if (event === 'SIGNED_OUT') editorRole = null;
+        if (event === 'SIGNED_OUT' || !session) {
+          editorRole = null;
+          emit('auth:changed', { event, session: null, role: null });
+          return;
+        }
         emit('auth:changed', { event, session, role: editorRole });
+        /* Проверять права внутри callback нельзя: Supabase держит блокировку.
+           Поэтому повторная проверка идёт следующим тиком. */
+        setTimeout(async () => {
+          const role = await resolveRole();
+          emit('auth:changed', { event, session, role });
+        }, 0);
       });
       emit('auth:changed', { event: 'INITIAL', session, role: editorRole });
       return session;
@@ -502,6 +538,7 @@
     signOut,
     session: () => session,
     role: () => editorRole,
+    refreshRole: resolveRole,
     isEditor: canWrite,
     uploadImage,
     ready
