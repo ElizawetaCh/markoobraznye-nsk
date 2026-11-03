@@ -289,10 +289,10 @@ body:before,body:after{opacity:.11}
 .screen{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
 .screen>.wrap{width:100%;flex:1;display:flex;flex-direction:column}
 .screen>.wrap>main{flex:1}
-.kapibara-credit{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;text-align:center;margin:30px auto 0;padding:0 0 4px}
-.kapibara-credit span{display:inline-block;color:#10151e;background:rgba(224,232,240,.90);border:1px solid rgba(255,255,255,.25);border-radius:7px;padding:6px 11px;font-size:var(--fs-7);font-weight:650;line-height:1.25;letter-spacing:.025em;box-shadow:0 3px 12px rgba(6,10,16,.14)}
-.welcome-card .kapibara-credit{margin-top:20px}
-@media(max-width:460px){.kapibara-credit{margin-top:25px}.kapibara-credit span{font-size:var(--fs-7);padding:6px 10px}}
+.club-credit{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;text-align:center;margin:30px auto 0;padding:0 0 4px}
+.club-credit span{display:inline-block;color:#10151e;background:rgba(224,232,240,.90);border:1px solid rgba(255,255,255,.25);border-radius:7px;padding:6px 11px;font-size:var(--fs-7);font-weight:650;line-height:1.25;letter-spacing:.025em;box-shadow:0 3px 12px rgba(6,10,16,.14)}
+.welcome-card .club-credit{margin-top:20px}
+@media(max-width:460px){.club-credit{margin-top:25px}.club-credit span{font-size:var(--fs-7);padding:6px 10px}}
 
 /* Six club shortcuts: two balanced rows on desktop and 2 columns on phones. */
 .tile-grid--club{grid-template-columns:repeat(3,minmax(0,1fr))}
